@@ -1,1 +1,7 @@
 .env
+.vscode/settings.json
+.mypy_cache/
+.vscode/
+venv/
+__pycache__/
+tests/test1.py
