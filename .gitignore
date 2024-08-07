@@ -6,3 +6,6 @@ venv/
 __pycache__/
 tests/test1.py
 .venv/
+tests/test1 copy.py
+bot/temp_tasks.db
+bot/temp_users.db
