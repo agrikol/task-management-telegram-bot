@@ -5,6 +5,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from config.config_reader import config
 from dialogs.start.dialogs import start_dialog
+from dialogs.create_task.dialogs import create_task_dialog
 from aiogram_dialog import setup_dialogs
 
 
@@ -17,6 +18,7 @@ async def main():
     dp: Dispatcher = Dispatcher()
     dp.include_router(commands.commands_router)
     dp.include_router(start_dialog)
+    dp.include_router(create_task_dialog)
     setup_dialogs(dp)
     await bot.delete_webhook(drop_pending_updates=True)
     await asyncio.gather(dp.start_polling(bot, allowed_updates=[]))
