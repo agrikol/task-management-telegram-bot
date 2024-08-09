@@ -1,18 +1,22 @@
 from aiogram_dialog import Dialog, Window
-from aiogram_dialog.widgets.text import Const
+from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
-from aiogram_dialog.widgets.kbd import Row, Cancel, SwitchTo, Calendar
+from aiogram_dialog.widgets.kbd import Row, Cancel, SwitchTo, Calendar, Button
 from states.states import CreateTaskSG
+from dialogs.create_task.getters import get_name
 from dialogs.create_task.handlers import (
-    name_check,
-    correct_age_handler,
-    error_age_handler,
+    add_desc_handler,
+    add_name_handler,
 )
 
 
 create_task_dialog = Dialog(
     Window(
-        Const("Создана новая задача"),
+        Format(
+            "Создана задача с именем: <code>{name}</code>\
+            \nОписание: {desc}\nКатегория: {categ}\nСрок: {due}\
+            \nУведомления: {notice}"
+        ),
         Row(
             SwitchTo(Const("Имя"), id="name", state=CreateTaskSG.name),
             SwitchTo(Const("Описание"), id="desc", state=CreateTaskSG.desc),
@@ -22,18 +26,23 @@ create_task_dialog = Dialog(
             SwitchTo(Const("Срок"), id="due", state=CreateTaskSG.due),
         ),
         SwitchTo(Const("Напоминание"), id="notice", state=CreateTaskSG.notice),
-        Cancel(Const("« В меню"), id="cancel"),
+        SwitchTo(Const("Сохранить задачу"), id="save", state=CreateTaskSG.save),
+        Cancel(Const("« Назад"), id="calcel"),
         state=CreateTaskSG.start,
+        getter=get_name,
     ),
     Window(
         Const("Введите имя задачи"),
         TextInput(
             id="add_name",
-            type_factory=name_check,
-            on_success=correct_age_handler,
-            on_error=error_age_handler,
+            on_success=add_name_handler,
         ),
         state=CreateTaskSG.name,
+    ),
+    Window(
+        Const("Введите описание задачи"),
+        TextInput(id="add_desc", on_success=add_desc_handler),
+        state=CreateTaskSG.desc,
     ),
     Window(
         Const("Выберите дату"),

@@ -12,5 +12,6 @@ commands_router: Router = Router()
 
 @commands_router.message(CommandStart())
 async def process_start_command(
-    message: Message, dialog_manager: DialogManager) -> None:
+    message: Message, dialog_manager: DialogManager
+) -> None:
     await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)

@@ -16,9 +16,7 @@ async def main():
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
     dp: Dispatcher = Dispatcher()
-    dp.include_router(commands.commands_router)
-    dp.include_router(start_dialog)
-    dp.include_router(create_task_dialog)
+    dp.include_routers(commands.commands_router, start_dialog, create_task_dialog)
     setup_dialogs(dp)
     await bot.delete_webhook(drop_pending_updates=True)
     await asyncio.gather(dp.start_polling(bot, allowed_updates=[]))

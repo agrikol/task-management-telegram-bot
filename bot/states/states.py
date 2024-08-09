@@ -12,6 +12,7 @@ class CreateTaskSG(StatesGroup):
     categ = State()
     due = State()
     notice = State()
+    save = State()
 
 
 class ShowTaskSG(StatesGroup):
