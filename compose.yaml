@@ -1,0 +1,8 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: todo_bot:latest
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
