@@ -2,9 +2,9 @@ from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Row, Cancel, SwitchTo, Calendar, Button
-from states.states import CreateTaskSG
-from dialogs.create_task.getters import get_name
-from dialogs.create_task.handlers import (
+from bot.states.states import CreateTaskSG
+from bot.dialogs.create_task.getters import get_name
+from bot.dialogs.create_task.handlers import (
     add_desc_handler,
     add_name_handler,
 )

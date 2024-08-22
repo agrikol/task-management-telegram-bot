@@ -1,9 +1,9 @@
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window, setup_dialogs
 from aiogram_dialog.widgets.text import Format, Case, Const, List
 from aiogram_dialog.widgets.kbd import Button, Row, Start
-from states.states import StartSG, CreateTaskSG, ShowTaskSG
-from dialogs.start.getters import get_name
-from dialogs.create_task.handlers import start_create_task
+from bot.states.states import StartSG, CreateTaskSG, ShowTaskSG
+from bot.dialogs.start.getters import get_name
+from bot.dialogs.create_task.handlers import start_create_task
 
 
 start_dialog = Dialog(

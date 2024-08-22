@@ -9,3 +9,4 @@ tests/test1.py
 tests/
 bot/db/temp_tasks.db
 bot/db/temp_users.db
+.DS_Store

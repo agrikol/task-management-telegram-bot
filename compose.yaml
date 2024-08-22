@@ -1,8 +1,22 @@
+version: "3.8"
 services:
   bot:
     build:
       context: .
       dockerfile: Dockerfile
-    image: todo_bot:latest
-    environment:
-      - BOT_TOKEN=${BOT_TOKEN}
+    image: todo_bot
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - redis_fsm
+
+  redis_fsm:
+    image: "redis:7"
+    restart: "unless-stopped"
+    volumes:
+      - "${REDIS_CONF_PATH}:/usr/local/etc/redis/redis.conf"
+      - "${REDIS_DATA_PATH}:/data"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]

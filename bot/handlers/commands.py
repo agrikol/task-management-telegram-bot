@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram_dialog import DialogManager, StartMode
-from states.states import StartSG
+from bot.states.states import StartSG
 
 
 commands_router: Router = Router()
