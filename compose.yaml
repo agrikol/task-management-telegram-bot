@@ -10,6 +10,7 @@ services:
     restart: unless-stopped
     depends_on:
       - redis_fsm
+      - postgres
 
   redis_fsm:
     image: "redis:7"
@@ -20,3 +21,34 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
+
+  postgres:
+    image: postgres:15-alpine
+    restart: "no"
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - "01-simple-alchemy-postgres:/var/lib/postgresql/data"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: "no"
+    ports:
+      - "127.0.0.1:8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - "01-simple-alchemy-pgadmin:/var/lib/pgadmin"
+    depends_on:
+      - postgres
+
+volumes:
+  01-simple-alchemy-pgadmin:
+  01-simple-alchemy-postgres:
+
+
