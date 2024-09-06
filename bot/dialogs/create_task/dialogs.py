@@ -7,6 +7,7 @@ from bot.dialogs.create_task.getters import get_name
 from bot.dialogs.create_task.handlers import (
     add_desc_handler,
     add_name_handler,
+    add_category,
 )
 
 
@@ -48,5 +49,38 @@ create_task_dialog = Dialog(
         Const("Выберите дату"),
         Calendar(id="date", on_click=lambda x: x),
         state=CreateTaskSG.due,
+    ),
+    Window(
+        Const("Выберите категорию"),
+        Row(
+            SwitchTo(
+                Const("🔴 Красная"),
+                id="category_1",
+                state=CreateTaskSG.start,
+                on_click=add_category,
+            ),
+            SwitchTo(
+                Const("🟡 Желтая"),
+                id="category_2",
+                state=CreateTaskSG.start,
+                on_click=add_category,
+            ),
+        ),
+        Row(
+            SwitchTo(
+                Const("🟢 Зеленая"),
+                id="category_3",
+                state=CreateTaskSG.start,
+                on_click=add_category,
+            ),
+            SwitchTo(
+                Const("🔵 Синяя"),
+                id="category_4",
+                state=CreateTaskSG.start,
+                on_click=add_category,
+            ),
+        ),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
+        state=CreateTaskSG.categ,
     ),
 )

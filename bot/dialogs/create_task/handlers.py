@@ -1,11 +1,9 @@
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
-from aiogram_dialog.widgets.kbd import Button
-from aiogram_dialog.widgets.text import Const
-from aiogram_dialog.widgets.text import Format
-from bot.states.states import CreateTaskSG, ShowTaskSG
+from aiogram_dialog.widgets.kbd import Button, SwitchTo
+from bot.states.states import CreateTaskSG
 from aiogram.types import Message
-from aiogram_dialog.widgets.input import ManagedTextInput
+from aiogram_dialog.widgets.input import TextInput
 
 
 # def name_check(text: str) -> str:
@@ -15,17 +13,25 @@ from aiogram_dialog.widgets.input import ManagedTextInput
 
 
 async def add_name_handler(
-    message: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str
+    message: Message, widget: TextInput, dialog_manager: DialogManager, text: str
 ) -> None:
     dialog_manager.dialog_data.update(name=text)
     await dialog_manager.switch_to(CreateTaskSG.start)
 
 
 async def add_desc_handler(
-    message: Message, widget: ManagedTextInput, dialog_manager: DialogManager, text: str
+    message: Message, widget: TextInput, dialog_manager: DialogManager, text: str
 ) -> None:
     dialog_manager.dialog_data.update(desc=text)
     await dialog_manager.switch_to(CreateTaskSG.start)
+
+
+async def add_category(
+    callback: CallbackQuery,
+    widget: SwitchTo,
+    dialog_manager: DialogManager,
+) -> None:
+    dialog_manager.dialog_data.update(categ=callback.data)
 
 
 # async def error_age_handler(
@@ -40,6 +46,8 @@ async def add_desc_handler(
 
 
 async def start_create_task(
-    callback: CallbackQuery, button: Button, dialog_manager: DialogManager
+    callback: CallbackQuery,
+    button: Button,
+    dialog_manager: DialogManager,
 ) -> None:
     await dialog_manager.start(CreateTaskSG.start)

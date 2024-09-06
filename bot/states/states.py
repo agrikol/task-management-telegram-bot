@@ -10,6 +10,7 @@ class CreateTaskSG(StatesGroup):
     name = State()
     desc = State()
     categ = State()
+    categ_list = State()
     due = State()
     notice = State()
     save = State()
