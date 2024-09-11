@@ -52,3 +52,22 @@ async def get_minutes(
             (hour + ":" + str(i).rjust(2, "0"), str(i)) for i in range(0, 60, 5)
         ]
     }
+
+
+async def get_notice(
+    dialog_manager: DialogManager,
+    **kwargs,
+) -> dict[str, str]:
+    return {
+        "notice_list": [
+            ("За минуту", "1"),
+            ("За 5 минут", "5"),
+            ("За 15 минут", "15"),
+            ("За 30 минут", "30"),
+            ("За час", "60"),
+            ("За 3 часа", "180"),
+            ("За 6 часов", "360"),
+            ("За день", "1440"),
+            ("За неделю", "10080"),
+        ]
+    }

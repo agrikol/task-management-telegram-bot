@@ -11,7 +11,7 @@ from aiogram_dialog.widgets.kbd import (
     Button,
 )
 from bot.states.states import CreateTaskSG
-from bot.dialogs.create_task.getters import get_name, get_hours, get_minutes
+from bot.dialogs.create_task.getters import get_name, get_hours, get_minutes, get_notice
 from bot.dialogs.create_task.handlers import (
     add_desc_handler,
     add_name_handler,
@@ -19,6 +19,7 @@ from bot.dialogs.create_task.handlers import (
     select_date,
     select_hour,
     save_due,
+    save_notice,
 )
 
 
@@ -44,7 +45,7 @@ create_task_dialog = Dialog(
         getter=get_name,
     ),
     Window(
-        Const("Введите имя задачи"),
+        Const("Введите имя задачи:"),
         TextInput(
             id="add_name",
             on_success=add_name_handler,
@@ -52,12 +53,12 @@ create_task_dialog = Dialog(
         state=CreateTaskSG.name,
     ),
     Window(
-        Const("Введите описание задачи"),
+        Const("Введите описание задачи:"),
         TextInput(id="add_desc", on_success=add_desc_handler),
         state=CreateTaskSG.desc,
     ),
     Window(
-        Const("Выберите дату"),
+        Const("Выберите дату:"),
         Calendar(id="date", on_click=select_date),
         SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
         state=CreateTaskSG.due,
@@ -95,7 +96,7 @@ create_task_dialog = Dialog(
         state=CreateTaskSG.due_minute,
     ),
     Window(
-        Const("Выберите категорию"),
+        Const("Выберите категорию:"),
         Row(
             SwitchTo(
                 Const("🔴 Красная"),
@@ -126,5 +127,21 @@ create_task_dialog = Dialog(
         ),
         SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
         state=CreateTaskSG.categ,
+    ),
+    Window(
+        Const("Когда прислать уведомление?"),  # TODO: Checkbox
+        Group(
+            Select(
+                Format("{item[0]}"),
+                id="notice",
+                item_id_getter=lambda x: x[1],
+                items="notice_list",
+                on_click=save_notice,
+            ),
+            width=4,
+        ),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
+        state=CreateTaskSG.notice,
+        getter=get_notice,
     ),
 )
