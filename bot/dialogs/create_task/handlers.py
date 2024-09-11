@@ -1,10 +1,11 @@
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
-from aiogram_dialog.widgets.kbd import Button, SwitchTo
+from aiogram_dialog.widgets.kbd import Button, SwitchTo, Select
 from bot.states.states import CreateTaskSG
 from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
-
+from aiogram_dialog.widgets.kbd import Calendar
+from datetime import date, datetime
 
 # def name_check(text: str) -> str:
 #     if bool(text):
@@ -13,25 +14,25 @@ from aiogram_dialog.widgets.input import TextInput
 
 
 async def add_name_handler(
-    message: Message, widget: TextInput, dialog_manager: DialogManager, text: str
+    message: Message, widget: TextInput, manager: DialogManager, text: str
 ) -> None:
-    dialog_manager.dialog_data.update(name=text)
-    await dialog_manager.switch_to(CreateTaskSG.start)
+    manager.dialog_data.update(name=text)
+    await manager.switch_to(CreateTaskSG.start)
 
 
 async def add_desc_handler(
-    message: Message, widget: TextInput, dialog_manager: DialogManager, text: str
+    message: Message, widget: TextInput, manager: DialogManager, text: str
 ) -> None:
-    dialog_manager.dialog_data.update(desc=text)
-    await dialog_manager.switch_to(CreateTaskSG.start)
+    manager.dialog_data.update(desc=text)
+    await manager.switch_to(CreateTaskSG.start)
 
 
 async def add_category(
     callback: CallbackQuery,
     widget: SwitchTo,
-    dialog_manager: DialogManager,
+    manager: DialogManager,
 ) -> None:
-    dialog_manager.dialog_data.update(categ=callback.data)
+    manager.dialog_data.update(categ=callback.data)
 
 
 # async def error_age_handler(
@@ -48,6 +49,37 @@ async def add_category(
 async def start_create_task(
     callback: CallbackQuery,
     button: Button,
-    dialog_manager: DialogManager,
+    manager: DialogManager,
 ) -> None:
-    await dialog_manager.start(CreateTaskSG.start)
+    await manager.start(CreateTaskSG.start)
+
+
+async def select_date(
+    callback: CallbackQuery,
+    widget: Calendar,
+    manager: DialogManager,
+    selected_date: date,
+):
+    manager.dialog_data["due"] = str(selected_date.strftime("%d.%m.%Y"))
+    await manager.switch_to(CreateTaskSG.due_hour)
+
+
+async def select_hour(
+    callback: CallbackQuery,
+    widget: Select,
+    manager: DialogManager,
+    hour: str,
+):
+    manager.dialog_data["time"] = hour
+    print(manager.dialog_data)
+    await manager.switch_to(CreateTaskSG.due_minute)
+
+
+async def save_due(
+    callback: CallbackQuery,
+    widget: Select,
+    manager: DialogManager,
+    minute: str,
+):
+    manager.dialog_data["time"] = manager.dialog_data["time"] + ":" + minute
+    await manager.switch_to(CreateTaskSG.start)

@@ -12,6 +12,8 @@ class CreateTaskSG(StatesGroup):
     categ = State()
     categ_list = State()
     due = State()
+    due_hour = State()
+    due_minute = State()
     notice = State()
     save = State()
 

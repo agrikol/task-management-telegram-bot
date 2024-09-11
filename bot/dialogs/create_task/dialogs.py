@@ -1,13 +1,24 @@
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
-from aiogram_dialog.widgets.kbd import Row, Cancel, SwitchTo, Calendar, Button
+from aiogram_dialog.widgets.kbd import (
+    Row,
+    Cancel,
+    SwitchTo,
+    Calendar,
+    Select,
+    Group,
+    Button,
+)
 from bot.states.states import CreateTaskSG
-from bot.dialogs.create_task.getters import get_name
+from bot.dialogs.create_task.getters import get_name, get_hours, get_minutes
 from bot.dialogs.create_task.handlers import (
     add_desc_handler,
     add_name_handler,
     add_category,
+    select_date,
+    select_hour,
+    save_due,
 )
 
 
@@ -47,8 +58,41 @@ create_task_dialog = Dialog(
     ),
     Window(
         Const("Выберите дату"),
-        Calendar(id="date", on_click=lambda x: x),
+        Calendar(id="date", on_click=select_date),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
         state=CreateTaskSG.due,
+    ),
+    Window(
+        Const("Выберите час:"),
+        Group(
+            Select(
+                Format("{item[0]}"),
+                id="time",
+                item_id_getter=lambda x: x[1],
+                items="time_list",
+                on_click=select_hour,
+            ),
+            width=6,
+        ),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
+        getter=get_hours,
+        state=CreateTaskSG.due_hour,
+    ),
+    Window(
+        Const("Выберите минуты:"),
+        Group(
+            Select(
+                Format("{item[0]}"),
+                id="time",
+                item_id_getter=lambda x: x[1],
+                items="time_list",
+                on_click=save_due,
+            ),
+            width=6,
+        ),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
+        getter=get_minutes,
+        state=CreateTaskSG.due_minute,
     ),
     Window(
         Const("Выберите категорию"),
