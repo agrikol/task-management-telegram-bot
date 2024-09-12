@@ -6,11 +6,8 @@ from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
-
-# def name_check(text: str) -> str:
-#     if bool(text):
-#         return text
-#     raise ValueError
+from sqlalchemy.ext.asyncio import AsyncSession
+from bot.db.requests import add_task
 
 
 async def add_name_handler(
@@ -71,7 +68,6 @@ async def select_hour(
     hour: str,
 ):
     manager.dialog_data["time"] = hour
-    print(manager.dialog_data)
     await manager.switch_to(CreateTaskSG.due_minute)
 
 
@@ -91,13 +87,41 @@ async def save_notice(
     manager: DialogManager,
     notice: str,
 ):
-    _date = manager.dialog_data.get("due") or str(
-        (date.today() + timedelta(days=1)).strftime("%d.%m.%Y")
+    _date = manager.dialog_data.setdefault(
+        "due", str((date.today() + timedelta(days=1)).strftime("%d.%m.%Y"))
     )
-    _time = manager.dialog_data.get("time") or "12:00"
+    _time = manager.dialog_data.setdefault("time", "12:00")
     notice: datetime = datetime.strptime(
         str(_date + " " + _time),
         "%d.%m.%Y %H:%M",
     ) - timedelta(minutes=int(notice))
     manager.dialog_data["notice"] = str(notice.strftime("%d.%m.%Y %H:%M"))
     await manager.switch_to(CreateTaskSG.start)
+
+
+async def save_task(
+    callback: CallbackQuery,
+    widget: Button,
+    manager: DialogManager,
+):
+    data: dict = manager.dialog_data
+    session: AsyncSession = manager.middleware_data.get("session")
+    await add_task(
+        session,
+        user_id=callback.from_user.id,
+        name=data.get("name"),
+        desc=data.get("desc"),
+        categ=data.get("categ"),
+        due=data.get("due") + " " + data.get("time"),
+        notice=data.get("notice"),
+    )
+    await callback.answer("✅ Задача сохранена")
+    await manager.done()
+
+
+async def clear_hours(
+    callback: CallbackQuery,
+    widget: SwitchTo,
+    manager: DialogManager,
+):
+    manager.dialog_data["time"] = "12:00"

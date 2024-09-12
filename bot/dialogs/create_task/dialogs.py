@@ -20,15 +20,17 @@ from bot.dialogs.create_task.handlers import (
     select_hour,
     save_due,
     save_notice,
+    save_task,
+    clear_hours,
 )
 
 
 create_task_dialog = Dialog(
     Window(
         Format(
-            "Создана задача с именем: <code>{name}</code>\
+            "Имя задачи: <code>{name}</code>\
             \nОписание: {desc}\nКатегория: {categ}\nСрок: {due}\
-            \nУведомления: {notice}"
+            \nНапоминание: {notice}"
         ),
         Row(
             SwitchTo(Const("Имя"), id="name", state=CreateTaskSG.name),
@@ -39,7 +41,11 @@ create_task_dialog = Dialog(
             SwitchTo(Const("Срок"), id="due", state=CreateTaskSG.due),
         ),
         SwitchTo(Const("Напоминание"), id="notice", state=CreateTaskSG.notice),
-        SwitchTo(Const("Сохранить задачу"), id="save", state=CreateTaskSG.save),
+        Button(
+            Const("✅ Сохранить задачу"),
+            id="save",
+            on_click=save_task,
+        ),
         Cancel(Const("« Назад"), id="calcel"),
         state=CreateTaskSG.start,
         getter=get_name,
@@ -75,7 +81,13 @@ create_task_dialog = Dialog(
             ),
             width=6,
         ),
-        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
+        SwitchTo(
+            Const("Пропустить »"),
+            id="cancel",
+            state=CreateTaskSG.start,
+            on_click=clear_hours,
+        ),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.due),
         getter=get_hours,
         state=CreateTaskSG.due_hour,
     ),
@@ -91,7 +103,12 @@ create_task_dialog = Dialog(
             ),
             width=6,
         ),
-        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
+        SwitchTo(
+            Const("« Назад"),
+            id="cancel",
+            state=CreateTaskSG.due_hour,
+            on_click=clear_hours,
+        ),
         getter=get_minutes,
         state=CreateTaskSG.due_minute,
     ),
@@ -129,7 +146,7 @@ create_task_dialog = Dialog(
         state=CreateTaskSG.categ,
     ),
     Window(
-        Const("Когда прислать уведомление?"),  # TODO: Checkbox
+        Const("Когда прислать напоминание?"),  # TODO: Checkbox
         Group(
             Select(
                 Format("{item[0]}"),

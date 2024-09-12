@@ -21,7 +21,7 @@ class User(TimestampMixin, Base):
     username: Mapped[str] = mapped_column(Text, nullable=True)
     last_name: Mapped[str] = mapped_column(Text, nullable=True)
 
-    tasks: Mapped[list["Task"]] = relationship(
+    task: Mapped[list["Task"]] = relationship(
         "Task", back_populates="user", cascade="delete"
     )
 
@@ -42,4 +42,4 @@ class Task(TimestampMixin, Base):
         ForeignKey("users.telegram_id", ondelete="CASCADE"),
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="tasks")
+    user: Mapped["User"] = relationship("User", back_populates="task")
