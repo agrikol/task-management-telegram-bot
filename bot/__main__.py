@@ -6,6 +6,7 @@ from aiogram.enums import ParseMode
 from bot.config.config_reader import config
 from bot.dialogs.start.dialogs import start_dialog
 from bot.dialogs.create_task.dialogs import create_task_dialog
+from bot.dialogs.get_tasks.dialogs import task_list_dialog
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram_dialog import setup_dialogs
 from aiogram.fsm.storage.base import DefaultKeyBuilder
@@ -40,7 +41,9 @@ async def main():
     Sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     dp.update.outer_middleware(DbSessionMiddleware(Sessionmaker))
     dp.message.outer_middleware(CacheMiddleware())
-    dp.include_routers(commands.commands_router, start_dialog, create_task_dialog)
+    dp.include_routers(
+        commands.commands_router, start_dialog, create_task_dialog, task_list_dialog
+    )
 
     bot: Bot = Bot(
         token=config.bot_token.get_secret_value(),

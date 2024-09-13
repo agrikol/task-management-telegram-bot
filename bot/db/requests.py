@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from bot.db.models import User, Task
 from sqlalchemy.dialects.postgresql import insert
 
@@ -53,3 +54,15 @@ async def add_task(
     stmt = stmt.on_conflict_do_nothing()
     await session.execute(stmt)
     await session.commit()
+
+
+async def get_task_info(session: AsyncSession, task_id: int):
+    stmt = select(Task).where(Task.task_id == task_id)
+    res = await session.execute(stmt)
+    return res.scalar()
+
+
+async def get_tasks_names(session: AsyncSession, user_id: int):
+    stmt = select(Task.name, Task.task_id).where(Task.user_id == user_id)
+    res = await session.execute(stmt)
+    return res.fetchall()

@@ -42,7 +42,7 @@ create_task_dialog = Dialog(
         ),
         SwitchTo(Const("Напоминание"), id="notice", state=CreateTaskSG.notice),
         Button(
-            Const("✅ Сохранить задачу"),
+            Const("☑️ Сохранить"),
             id="save",
             on_click=save_task,
         ),

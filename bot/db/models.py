@@ -1,6 +1,6 @@
 from datetime import datetime
 from bot.db.base import Base
-from sqlalchemy import BigInteger, DateTime, Text, func, ForeignKey, Uuid, text
+from sqlalchemy import BigInteger, Integer, DateTime, Text, func, ForeignKey, Uuid, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import UUID
 
@@ -29,9 +29,7 @@ class User(TimestampMixin, Base):
 class Task(TimestampMixin, Base):
     __tablename__ = "tasks"
 
-    task_id: Mapped[UUID] = mapped_column(
-        Uuid, primary_key=True, server_default=text("gen_random_uuid()")
-    )
+    task_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
     desc: Mapped[str] = mapped_column(Text, nullable=True)
     due: Mapped[str] = mapped_column(Text, nullable=True)
@@ -43,3 +41,17 @@ class Task(TimestampMixin, Base):
     )
 
     user: Mapped["User"] = relationship("User", back_populates="task")
+
+    def __str__(self):
+        return f"User_id: {self.user_id}, Name: {self.name}, Desc: {self.desc},\
+        Due: {self.due}, Categ: {self.categ}, Notice: {self.notice}"
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "desc": self.desc,
+            "due": self.due,
+            "categ": self.categ,
+            "notice": self.notice,
+            "user_id": self.user_id,
+        }

@@ -43,14 +43,6 @@ async def add_category(
 #     )
 
 
-async def start_create_task(
-    callback: CallbackQuery,
-    button: Button,
-    manager: DialogManager,
-) -> None:
-    await manager.start(CreateTaskSG.start)
-
-
 async def select_date(
     callback: CallbackQuery,
     widget: Calendar,
