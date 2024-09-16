@@ -11,7 +11,12 @@ from aiogram_dialog.widgets.kbd import (
     Button,
 )
 from bot.states.states import CreateTaskSG
-from bot.dialogs.create_task.getters import get_name, get_hours, get_minutes, get_notice
+from bot.dialogs.create_task.getters import (
+    get_template,
+    get_hours,
+    get_minutes,
+    get_notice,
+)
 from bot.dialogs.create_task.handlers import (
     add_desc_handler,
     add_name_handler,
@@ -48,7 +53,7 @@ create_task_dialog = Dialog(
         ),
         Cancel(Const("« Назад"), id="calcel"),
         state=CreateTaskSG.start,
-        getter=get_name,
+        getter=get_template,
     ),
     Window(
         Const("Введите имя задачи:"),

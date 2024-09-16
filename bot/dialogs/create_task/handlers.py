@@ -103,7 +103,7 @@ async def save_task(
         user_id=callback.from_user.id,
         name=data.get("name"),
         desc=data.get("desc"),
-        categ=data.get("categ"),
+        categ=data.get("categ", "Без категории"),
         due=data.get("due") + " " + data.get("time"),
         notice=data.get("notice"),
     )

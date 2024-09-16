@@ -8,6 +8,7 @@ from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.db.requests import add_task, get_task_info
+from bot.db.models import Task
 
 
 async def listing_tasks(
@@ -17,7 +18,9 @@ async def listing_tasks(
     *args,
     **kwargs,
 ):
-    manager.dialog_data.update(task_id=callback.data)
+    session: AsyncSession = manager.middleware_data.get("session")
+    task: Task = await get_task_info(session, int(callback.data.split(":")[1]))
+    manager.dialog_data.update(task.to_dict())
     await manager.switch_to(ShowTasksSG.task_edit)
 
 
@@ -39,3 +42,27 @@ async def edit_task(
     )
     await callback.answer("✅ Задача сохранена")
     await manager.done()
+
+
+async def edit_name_handler(
+    message: Message, widget: TextInput, manager: DialogManager, text: str
+) -> None:
+    manager.dialog_data.update(name=text)
+    await manager.switch_to(ShowTasksSG.task_edit)
+
+
+async def edit_desc_handler(
+    message: Message, widget: TextInput, manager: DialogManager, text: str
+) -> None:
+    manager.dialog_data.update(desc=text)
+    await manager.switch_to(ShowTasksSG.task_edit)
+
+
+async def edit_category(
+    callback: CallbackQuery,
+    widget: SwitchTo,
+    manager: DialogManager,
+    *args,
+) -> None:
+    manager.dialog_data.update(categ=callback.data.split(":")[1])
+    await manager.switch_to(ShowTasksSG.task_edit)

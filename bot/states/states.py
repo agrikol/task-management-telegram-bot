@@ -21,6 +21,7 @@ class CreateTaskSG(StatesGroup):
 class ShowTasksSG(StatesGroup):
     start = State()
     task_edit = State()
+    task_edited = State()
     name = State()
     desc = State()
     categ = State()

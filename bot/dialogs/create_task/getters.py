@@ -9,8 +9,15 @@ categories: dict = {
     "category_4": "🔵 Синяя",
 }
 
+# categories_temp: dict = [
+#     ("🔴 Красная", "category_1"),
+#     ("🟡 Желтая", "category_2"),
+#     ("🟢 Зеленая", "category_3"),
+#     ("🔵 Синяя", "category_4"),
+# ]
 
-async def get_name(
+
+async def get_template(
     dialog_manager: DialogManager,
     **kwargs,
 ) -> dict[str, str]:

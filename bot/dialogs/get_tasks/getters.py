@@ -1,22 +1,26 @@
 from aiogram_dialog import DialogManager
 from aiogram.types import User
-from bot.db.requests import get_tasks_names, get_task_info
-from bot.db.models import Task
-from sqlalchemy.ext.asyncio import AsyncSession
+from bot.dialogs.create_task.getters import categories
 
 
-async def getter_of_names(
-    dialog_manager: DialogManager, event_from_user: User, **kwargs
-):
-    session = dialog_manager.middleware_data.get("session")
-    task_names = await get_tasks_names(session, event_from_user.id)
-    return {"task_names": task_names}
+async def getter_of_names(dialog_manager: DialogManager, **kwargs):
+    if dialog_manager.start_data:
+        dialog_manager.dialog_data.update(
+            task_names=dialog_manager.start_data.get("task_names")
+        )
+        dialog_manager.start_data.clear()
+    data = dialog_manager.dialog_data.get("task_names")
+    return {"task_names": data}
 
 
 async def getter_of_task(
     dialog_manager: DialogManager, event_from_user: User, **kwargs
 ):
-    session: AsyncSession = dialog_manager.middleware_data.get("session")
-    task_id: str = dialog_manager.dialog_data.get("task_id")
-    task: Task = await get_task_info(session, int(task_id.split(":")[1]))
-    return task.to_dict()
+    print(dialog_manager.dialog_data)
+    categ = categories.get(dialog_manager.dialog_data.get("categ"), "Без категории")
+    dialog_manager.dialog_data["categ"] = categ
+    return dialog_manager.dialog_data
+
+
+async def getter_of_categ(dialog_manager: DialogManager, **kwargs):
+    return {"categories": [(value, key) for key, value in categories.items()]}
