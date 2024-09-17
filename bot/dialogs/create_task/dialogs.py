@@ -9,6 +9,7 @@ from aiogram_dialog.widgets.kbd import (
     Select,
     Group,
     Button,
+    Back,
 )
 from bot.states.states import CreateTaskSG
 from bot.dialogs.create_task.getters import (
@@ -20,7 +21,7 @@ from bot.dialogs.create_task.getters import (
 from bot.dialogs.create_task.handlers import (
     add_desc_handler,
     add_name_handler,
-    add_category,
+    add_tag,
     select_date,
     select_hour,
     save_due,
@@ -34,7 +35,7 @@ create_task_dialog = Dialog(
     Window(
         Format(
             "Имя задачи: <code>{name}</code>\
-            \nОписание: {desc}\nКатегория: {categ}\nСрок: {due}\
+            \nОписание: {desc}\nТэг: {tag}\nСрок: {due}\
             \nНапоминание: {notice}"
         ),
         Row(
@@ -42,7 +43,7 @@ create_task_dialog = Dialog(
             SwitchTo(Const("Описание"), id="desc", state=CreateTaskSG.desc),
         ),
         Row(
-            SwitchTo(Const("Категория"), id="categ", state=CreateTaskSG.categ),
+            SwitchTo(Const("Тэг"), id="tag", state=CreateTaskSG.tag),
             SwitchTo(Const("Срок"), id="due", state=CreateTaskSG.due),
         ),
         SwitchTo(Const("Напоминание"), id="notice", state=CreateTaskSG.notice),
@@ -92,7 +93,7 @@ create_task_dialog = Dialog(
             state=CreateTaskSG.start,
             on_click=clear_hours,
         ),
-        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.due),
+        Back(Const("« Назад"), id="to_date"),
         getter=get_hours,
         state=CreateTaskSG.due_hour,
     ),
@@ -108,47 +109,46 @@ create_task_dialog = Dialog(
             ),
             width=6,
         ),
-        SwitchTo(
+        Back(
             Const("« Назад"),
-            id="cancel",
-            state=CreateTaskSG.due_hour,
+            id="to_hours",
             on_click=clear_hours,
         ),
         getter=get_minutes,
         state=CreateTaskSG.due_minute,
     ),
     Window(
-        Const("Выберите категорию:"),
+        Const("Выберите тэг:"),
         Row(
             SwitchTo(
-                Const("🔴 Красная"),
-                id="category_1",
+                Const("🔴"),  # TODO: Switch to Select
+                id="1",
                 state=CreateTaskSG.start,
-                on_click=add_category,
+                on_click=add_tag,
             ),
             SwitchTo(
-                Const("🟡 Желтая"),
-                id="category_2",
+                Const("🟡"),
+                id="2",
                 state=CreateTaskSG.start,
-                on_click=add_category,
+                on_click=add_tag,
             ),
         ),
         Row(
             SwitchTo(
-                Const("🟢 Зеленая"),
-                id="category_3",
+                Const("🟢"),
+                id="3",
                 state=CreateTaskSG.start,
-                on_click=add_category,
+                on_click=add_tag,
             ),
             SwitchTo(
-                Const("🔵 Синяя"),
-                id="category_4",
+                Const("🔵"),
+                id="4",
                 state=CreateTaskSG.start,
-                on_click=add_category,
+                on_click=add_tag,
             ),
         ),
         SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
-        state=CreateTaskSG.categ,
+        state=CreateTaskSG.tag,
     ),
     Window(
         Const("Когда прислать напоминание?"),  # TODO: Checkbox

@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from bot.db.models import User, Task
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import update, and_
 
 
 async def add_user(
@@ -38,7 +39,7 @@ async def add_task(
     name: str,
     desc: str | None = None,
     due: str | None = None,
-    categ: str | None = None,
+    tag: str | None = None,
     notice: str | None = None,
 ):
     stmt = insert(Task).values(
@@ -46,12 +47,46 @@ async def add_task(
             Task.name: name,
             Task.desc: desc,
             Task.due: due,
-            Task.categ: categ,
+            Task.tag: tag,
             Task.notice: notice,
             Task.user_id: user_id,
         }
     )
     stmt = stmt.on_conflict_do_nothing()
+    await session.execute(stmt)
+    await session.commit()
+
+
+async def update_task(
+    session: AsyncSession,
+    task_id: int,
+    name: str,
+    desc: str,
+    due: str,
+    tag: str,
+    notice: str,
+    status: int = 1,
+):
+    stmt = (
+        update(Task)
+        .where(Task.task_id == task_id)
+        .values(
+            {
+                Task.name: name,
+                Task.desc: desc,
+                Task.due: due,
+                Task.tag: tag,
+                Task.notice: notice,
+                Task.status: status,
+            }
+        )
+    )
+    await session.execute(stmt)
+    await session.commit()
+
+
+async def change_status_db(session: AsyncSession, task_id: int, status: int = 0):
+    stmt = update(Task).where(Task.task_id == task_id).values(status=status)
     await session.execute(stmt)
     await session.commit()
 
@@ -63,6 +98,8 @@ async def get_task_info(session: AsyncSession, task_id: int):
 
 
 async def get_tasks_names(session: AsyncSession, user_id: int):
-    stmt = select(Task.name, Task.task_id).where(Task.user_id == user_id)
+    stmt = select(Task.name, Task.task_id).where(
+        and_(Task.user_id == user_id, Task.status == 1)
+    )
     res = await session.execute(stmt)
     return res.fetchall()

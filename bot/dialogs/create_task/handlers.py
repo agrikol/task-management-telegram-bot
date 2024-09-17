@@ -24,12 +24,12 @@ async def add_desc_handler(
     await manager.switch_to(CreateTaskSG.start)
 
 
-async def add_category(
+async def add_tag(
     callback: CallbackQuery,
     widget: SwitchTo,
     manager: DialogManager,
 ) -> None:
-    manager.dialog_data.update(categ=callback.data)
+    manager.dialog_data.update(tag=callback.data)
 
 
 # async def error_age_handler(
@@ -79,15 +79,13 @@ async def save_notice(
     manager: DialogManager,
     notice: str,
 ):
-    _date = manager.dialog_data.setdefault(
-        "due", str((date.today() + timedelta(days=1)).strftime("%d.%m.%Y"))
-    )
-    _time = manager.dialog_data.setdefault("time", "12:00")
+    _date = manager.dialog_data.get("due")
+    _time = manager.dialog_data.get("time")
     notice: datetime = datetime.strptime(
         str(_date + " " + _time),
         "%d.%m.%Y %H:%M",
     ) - timedelta(minutes=int(notice))
-    manager.dialog_data["notice"] = str(notice.strftime("%d.%m.%Y %H:%M"))
+    manager.dialog_data["notice"] = notice.strftime("%d.%m.%Y %H:%M")
     await manager.switch_to(CreateTaskSG.start)
 
 
@@ -103,11 +101,11 @@ async def save_task(
         user_id=callback.from_user.id,
         name=data.get("name"),
         desc=data.get("desc"),
-        categ=data.get("categ", "Без категории"),
+        tag=data.get("tag", "Без тэга"),
         due=data.get("due") + " " + data.get("time"),
         notice=data.get("notice"),
     )
-    await callback.answer("✅ Задача сохранена")
+    await callback.answer("☑️ Задача сохранена")
     await manager.done()
 
 

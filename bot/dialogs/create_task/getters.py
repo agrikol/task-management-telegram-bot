@@ -2,18 +2,18 @@ from aiogram_dialog import DialogManager
 from datetime import date, timedelta
 
 
-categories: dict = {
-    "category_1": "🔴 Красная",
-    "category_2": "🟡 Желтая",
-    "category_3": "🟢 Зеленая",
-    "category_4": "🔵 Синяя",
+tags: dict = {
+    "1": "🔴",
+    "2": "🟡",
+    "3": "🟢",
+    "4": "🔵",
 }
 
-# categories_temp: dict = [
-#     ("🔴 Красная", "category_1"),
-#     ("🟡 Желтая", "category_2"),
-#     ("🟢 Зеленая", "category_3"),
-#     ("🔵 Синяя", "category_4"),
+# tag_temp: dict = [
+#     ("🔴 Красная", "1"),
+#     ("🟡 Желтая", "2"),
+#     ("🟢 Зеленая", "3"),
+#     ("🔵 Синяя", "4"),
 # ]
 
 
@@ -27,13 +27,13 @@ async def get_template(
         "due", (date.today() + timedelta(days=1)).strftime("%d.%m.%Y")
     )
     time = dialog_manager.dialog_data.setdefault("time", "12:00")
-    categ = categories.get(dialog_manager.dialog_data.get("categ"), "Без категории")
+    tag = tags.get(dialog_manager.dialog_data.get("tag"), "Без тэга")
     notice = dialog_manager.dialog_data.setdefault("notice", "Отсутствует")
     return {
         "name": name,
         "desc": desc,
         "due": due + " " + time,
-        "categ": categ,
+        "tag": tag,
         "notice": notice,
     }
 
@@ -56,7 +56,8 @@ async def get_minutes(
     hour = dialog_manager.dialog_data.get("time")
     return {
         "time_list": [
-            (hour + ":" + str(i).rjust(2, "0"), str(i)) for i in range(0, 60, 5)
+            (hour + ":" + str(i).rjust(2, "0"), str(i).rjust(2, "0"))
+            for i in range(0, 60, 5)
         ]
     }
 
