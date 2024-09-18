@@ -98,8 +98,11 @@ async def get_task_info(session: AsyncSession, task_id: int):
 
 
 async def get_tasks_names(session: AsyncSession, user_id: int):
-    stmt = select(Task.name, Task.task_id).where(
-        and_(Task.user_id == user_id, Task.status == 1)
-    )
+    stmt = select(
+        Task.name,
+        Task.tag,
+        Task.due,
+        Task.task_id,
+    ).where(and_(Task.user_id == user_id, Task.status == 1))
     res = await session.execute(stmt)
     return res.fetchall()

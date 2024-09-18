@@ -3,6 +3,7 @@ from datetime import date, timedelta
 
 
 tags: dict = {
+    "0": "Без тэга",
     "1": "🔴",
     "2": "🟡",
     "3": "🟢",

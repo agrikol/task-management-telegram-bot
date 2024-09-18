@@ -8,12 +8,20 @@ from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.db.requests import add_task
+from aiogram import Bot
 
 
 async def add_name_handler(
     message: Message, widget: TextInput, manager: DialogManager, text: str
 ) -> None:
+    bot: Bot = manager.middleware_data["bot"]
     manager.dialog_data.update(name=text)
+    try:
+        await bot.delete_messages(
+            message.chat.id, [message.message_id - 1, message.message_id]
+        )
+    except Exception as e:
+        pass  # TODO add logger
     await manager.switch_to(CreateTaskSG.start)
 
 
@@ -21,6 +29,13 @@ async def add_desc_handler(
     message: Message, widget: TextInput, manager: DialogManager, text: str
 ) -> None:
     manager.dialog_data.update(desc=text)
+    bot: Bot = manager.middleware_data["bot"]
+    try:
+        await bot.delete_messages(
+            message.chat.id, [message.message_id - 1, message.message_id]
+        )
+    except Exception as e:
+        pass  # TODO add logger
     await manager.switch_to(CreateTaskSG.start)
 
 
