@@ -108,7 +108,7 @@ task_list_dialog = Dialog(
                 items="tags",
                 on_click=edit_tag,
             ),
-            width=2,
+            width=1,
         ),
         SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
         state=ShowTasksSG.tag,

@@ -43,8 +43,10 @@ async def add_tag(
     callback: CallbackQuery,
     widget: SwitchTo,
     manager: DialogManager,
+    *args,
 ) -> None:
-    manager.dialog_data.update(tag=callback.data)
+    manager.dialog_data.update(tag=callback.data.split(":")[1])
+    await manager.switch_to(CreateTaskSG.start)
 
 
 # async def error_age_handler(
@@ -116,7 +118,7 @@ async def save_task(
         user_id=callback.from_user.id,
         name=data.get("name"),
         desc=data.get("desc"),
-        tag=data.get("tag", "Без тэга"),
+        tag=data.get("tag", "0"),
         due=data.get("due") + " " + data.get("time"),
         notice=data.get("notice"),
     )

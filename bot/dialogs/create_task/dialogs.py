@@ -1,3 +1,4 @@
+from operator import itemgetter
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
@@ -17,6 +18,7 @@ from bot.dialogs.create_task.getters import (
     get_hours,
     get_minutes,
     get_notice,
+    getter_of_tag,
 )
 from bot.dialogs.create_task.handlers import (
     add_desc_handler,
@@ -81,7 +83,7 @@ create_task_dialog = Dialog(
             Select(
                 Format("{item[0]}"),
                 id="time",
-                item_id_getter=lambda x: x[1],
+                item_id_getter=itemgetter(1),
                 items="time_list",
                 on_click=select_hour,
             ),
@@ -103,7 +105,7 @@ create_task_dialog = Dialog(
             Select(
                 Format("{item[0]}"),
                 id="time",
-                item_id_getter=lambda x: x[1],
+                item_id_getter=itemgetter(1),
                 items="time_list",
                 on_click=save_due,
             ),
@@ -119,36 +121,19 @@ create_task_dialog = Dialog(
     ),
     Window(
         Const("Выберите тэг:"),
-        Row(
-            SwitchTo(
-                Const("🔴"),  # TODO: Switch to Select
-                id="1",
-                state=CreateTaskSG.start,
+        Group(
+            Select(
+                Format("{item[0]}"),
+                id="tag",
+                item_id_getter=itemgetter(1),
+                items="tags",
                 on_click=add_tag,
             ),
-            SwitchTo(
-                Const("🟡"),
-                id="2",
-                state=CreateTaskSG.start,
-                on_click=add_tag,
-            ),
-        ),
-        Row(
-            SwitchTo(
-                Const("🟢"),
-                id="3",
-                state=CreateTaskSG.start,
-                on_click=add_tag,
-            ),
-            SwitchTo(
-                Const("🔵"),
-                id="4",
-                state=CreateTaskSG.start,
-                on_click=add_tag,
-            ),
+            width=1,
         ),
         SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
         state=CreateTaskSG.tag,
+        getter=getter_of_tag,
     ),
     Window(
         Const("Когда прислать напоминание?"),  # TODO: Checkbox
@@ -156,7 +141,7 @@ create_task_dialog = Dialog(
             Select(
                 Format("{item[0]}"),
                 id="notice",
-                item_id_getter=lambda x: x[1],
+                item_id_getter=itemgetter(1),
                 items="notice_list",
                 on_click=save_notice,
             ),

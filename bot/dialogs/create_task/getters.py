@@ -10,13 +10,6 @@ tags: dict = {
     "4": "🔵",
 }
 
-# tag_temp: dict = [
-#     ("🔴 Красная", "1"),
-#     ("🟡 Желтая", "2"),
-#     ("🟢 Зеленая", "3"),
-#     ("🔵 Синяя", "4"),
-# ]
-
 
 async def get_template(
     dialog_manager: DialogManager,
@@ -61,6 +54,10 @@ async def get_minutes(
             for i in range(0, 60, 5)
         ]
     }
+
+
+async def getter_of_tag(dialog_manager: DialogManager, **kwargs):
+    return {"tags": [(value, key) for key, value in tags.items()]}
 
 
 async def get_notice(

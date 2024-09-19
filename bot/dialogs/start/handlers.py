@@ -24,7 +24,7 @@ async def start_get_tasks(
     names = []
     for name, tag, date, task_id in request_result:
         date: str = date[:5]
-        name = f"{tags[tag]} {name} [{date}]"
+        name = f"{tags[tag] if tag != '0' else ''} {name} [{date}]"
         names.append((name, str(task_id)))
 
     await manager.start(ShowTasksSG.start, data={"task_names": names})

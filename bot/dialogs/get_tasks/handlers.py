@@ -1,7 +1,10 @@
+from bot.db.models import Task
+from aiogram import Bot
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Select
 from bot.states.states import ShowTasksSG
+from bot.dialogs.get_tasks.getters import tags
 from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
@@ -13,8 +16,6 @@ from bot.db.requests import (
     change_status_db,
     get_tasks_names,
 )
-from bot.db.models import Task
-from aiogram import Bot
 
 
 async def listing_tasks(
@@ -50,8 +51,12 @@ async def edit_task(
         notice=data.get("notice"),
     )
     await callback.answer("☑️ Задача сохранена")
-    names = await get_tasks_names(session, callback.from_user.id)
-    manager.dialog_data["task_names"] = [(i, str(j)) for i, j in names]
+    request_result = await get_tasks_names(session, callback.from_user.id)
+    manager.dialog_data["task_names"] = []
+    for name, tag, date, task_id in request_result:
+        date: str = date[:5]
+        name = f"{tags[tag] if tag != '0' else ''} {name} [{date}]"
+        manager.dialog_data["task_names"].append((name, str(task_id)))
     await manager.switch_to(ShowTasksSG.start)
 
 
@@ -90,7 +95,6 @@ async def edit_tag(
     *args,
 ) -> None:
     manager.dialog_data.update(tag=callback.data.split(":")[1])
-    print(manager.dialog_data)
     await manager.switch_to(ShowTasksSG.task_edit)
 
 
