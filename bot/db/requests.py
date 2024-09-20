@@ -102,12 +102,19 @@ async def get_task_info(session: AsyncSession, task_id: int):
     return res.scalar()
 
 
-async def get_tasks_names(session: AsyncSession, user_id: int):
-    stmt = select(
-        Task.name,
-        Task.tag,
-        Task.date,
-        Task.task_id,
-    ).where(and_(Task.user_id == user_id, Task.status == 1))
+async def get_tasks_names(session: AsyncSession, user_id: int, today: bool = False):
+    stmt = select(Task.name, Task.tag, Task.date, Task.task_id).where(
+        and_(Task.user_id == user_id, Task.status == 1)
+    )
+    if today:
+        stmt = stmt.where(Task.date == date.today())
     res = await session.execute(stmt)
     return res.fetchall()
+
+
+async def check_tasks_exist(session: AsyncSession, user_id: int):
+    stmt = select(Task).where(and_(Task.user_id == user_id, Task.status == 1))
+    res = await session.execute(stmt)
+    tasks_exist = res.scalars().all()
+    today_exists = any(date.today() == task.date for task in tasks_exist)
+    return bool(tasks_exist), today_exists

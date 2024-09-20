@@ -67,12 +67,12 @@ async def edit_task(
     )
     await callback.answer("☑️ Задача сохранена")
     request_result = await get_tasks_names(session, callback.from_user.id)
-    manager.dialog_data["task_names"] = []
-    for name, tag, date, task_id in request_result:
-        date: str = datetime.strftime(date, "%d.%m")
-        name = f"{tags[tag] if tag != '0' else ''} {name} [{date}]"
-        manager.dialog_data["task_names"].append((name, str(task_id)))
-    await manager.switch_to(ShowTasksSG.start)
+    # manager.dialog_data["task_names"] = []
+    # for name, tag, date, task_id in request_result:
+    #     date: str = datetime.strftime(date, "%d.%m")
+    #     name = f"{tags[tag] if tag != '0' else ''} {name} [{date}]"
+    #     manager.dialog_data["task_names"].append((name, str(task_id)))
+    await manager.done()
 
 
 async def edit_name_handler(
@@ -176,9 +176,10 @@ async def delete_task(
     session: AsyncSession = manager.middleware_data.get("session")
     await callback.answer("❌ Задача удалена")
     await change_status_db(session, int(manager.dialog_data.get("task_id")))
-    names = await get_tasks_names(session, callback.from_user.id)
-    manager.dialog_data["task_names"] = [(i, str(j)) for i, j in names]
-    await manager.switch_to(ShowTasksSG.start)
+    # names = await get_tasks_names(session, callback.from_user.id)
+    # manager.dialog_data["task_names"] = [(i, str(j)) for i, j in names]
+    # await manager.switch_to(ShowTasksSG.start)
+    await manager.done()
 
 
 async def complete_task(
@@ -189,6 +190,7 @@ async def complete_task(
     session: AsyncSession = manager.middleware_data.get("session")
     await callback.answer("✅ Задача выполнена")
     await change_status_db(session, int(manager.dialog_data.get("task_id")), status=2)
-    names = await get_tasks_names(session, callback.from_user.id)
-    manager.dialog_data["task_names"] = [(i, str(j)) for i, j in names]
-    await manager.switch_to(ShowTasksSG.start)
+    # names = await get_tasks_names(session, callback.from_user.id)
+    # manager.dialog_data["task_names"] = [(i, str(j)) for i, j in names]
+    # await manager.switch_to(ShowTasksSG.start)
+    await manager.done()

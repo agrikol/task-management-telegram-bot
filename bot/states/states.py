@@ -34,6 +34,10 @@ class ShowTasksSG(StatesGroup):
     delete = State()
 
 
+class TodayTasksSG(StatesGroup):
+    start = State()
+
+
 class HelpSG(StatesGroup):
     start = State()
 
