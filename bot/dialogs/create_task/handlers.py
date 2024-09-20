@@ -1,3 +1,5 @@
+from aiogram import Bot
+from datetime import datetime, date
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Select
@@ -8,7 +10,6 @@ from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.db.requests import add_task
-from aiogram import Bot
 
 
 async def add_name_handler(
@@ -66,7 +67,7 @@ async def select_date(
     manager: DialogManager,
     selected_date: date,
 ):
-    manager.dialog_data["due"] = str(selected_date.strftime("%d.%m.%Y"))
+    manager.dialog_data["date"] = str(selected_date.strftime("%d.%m.%Y"))
     await manager.switch_to(CreateTaskSG.due_hour)
 
 
@@ -86,7 +87,7 @@ async def save_due(
     manager: DialogManager,
     minute: str,
 ):
-    manager.dialog_data["time"] = manager.dialog_data["time"] + ":" + minute
+    manager.dialog_data["time"] = f"{manager.dialog_data['time']}:{minute}"
     await manager.switch_to(CreateTaskSG.start)
 
 
@@ -96,7 +97,7 @@ async def save_notice(
     manager: DialogManager,
     notice: str,
 ):
-    _date = manager.dialog_data.get("due")
+    _date = manager.dialog_data.get("date")
     _time = manager.dialog_data.get("time")
     notice: datetime = datetime.strptime(
         str(_date + " " + _time),
@@ -113,14 +114,20 @@ async def save_task(
 ):
     data: dict = manager.dialog_data
     session: AsyncSession = manager.middleware_data.get("session")
+    notice: str | None = (
+        datetime.strptime(data.get("notice"), "%d.%m.%Y %H:%M")
+        if data.get("notice")
+        else None
+    )
     await add_task(
         session,
         user_id=callback.from_user.id,
         name=data.get("name"),
         desc=data.get("desc"),
         tag=data.get("tag", "0"),
-        due=data.get("due") + " " + data.get("time"),
-        notice=data.get("notice"),
+        _date=datetime.strptime(data.get("date"), "%d.%m.%Y").date(),
+        _time=datetime.strptime(data.get("time"), "%H:%M").time(),
+        notice=notice,
     )
     await callback.answer("☑️ Задача сохранена")
     await manager.done()

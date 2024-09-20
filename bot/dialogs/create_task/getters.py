@@ -1,5 +1,5 @@
 from aiogram_dialog import DialogManager
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 tags: dict = {
@@ -15,18 +15,20 @@ async def get_template(
     dialog_manager: DialogManager,
     **kwargs,
 ) -> dict[str, str]:
-    name = "<b>" + dialog_manager.dialog_data.setdefault("name", "Новая") + "</b>"
-    desc = "<i>" + dialog_manager.dialog_data.setdefault("desc", "Отсутствует") + "</i>"
-    due = dialog_manager.dialog_data.setdefault(
-        "due", (date.today() + timedelta(days=1)).strftime("%d.%m.%Y")
+    dialog_data = dialog_manager.dialog_data
+    name = f"<b>{dialog_data.setdefault('name', 'Новая')}</b>"
+    desc = f"<i>{dialog_data.setdefault('desc', 'Отсутствует')}</i>"
+    _date = dialog_data.setdefault(
+        "date", (date.today() + timedelta(days=1)).strftime("%d.%m.%Y")
     )
-    time = dialog_manager.dialog_data.setdefault("time", "12:00")
-    tag = tags.get(dialog_manager.dialog_data.get("tag"), "Без тэга")
-    notice = dialog_manager.dialog_data.setdefault("notice", "Отсутствует")
+    _time = dialog_data.setdefault("time", "12:00")
+    tag = tags.get(dialog_data.setdefault("tag", "0"))
+    notice: str | None = dialog_data.get("notice")
+    notice = notice if notice else "Отсутствует"
     return {
         "name": name,
         "desc": desc,
-        "due": due + " " + time,
+        "due": f"{_date} {_time}",
         "tag": tag,
         "notice": notice,
     }

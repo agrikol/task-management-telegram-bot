@@ -16,9 +16,10 @@ async def getter_of_names(dialog_manager: DialogManager, **kwargs):
 async def getter_of_task(
     dialog_manager: DialogManager, event_from_user: User, **kwargs
 ):
-    tag = tags.get(dialog_manager.dialog_data.get("tag"), "Без тэга")
     data = dialog_manager.dialog_data.copy()
+    tag = tags.get(data.get("tag"))
     data["tag"] = tag
+    data["due"] = f"{data['date']} {data['time']}"
     return data
 
 

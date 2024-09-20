@@ -1,3 +1,4 @@
+from datetime import datetime
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
@@ -23,7 +24,7 @@ async def start_get_tasks(
     request_result = await get_tasks_names(session, callback.from_user.id)
     names = []
     for name, tag, date, task_id in request_result:
-        date: str = date[:5]
+        date: str = datetime.strftime(date, "%d.%m")
         name = f"{tags[tag] if tag != '0' else ''} {name} [{date}]"
         names.append((name, str(task_id)))
 

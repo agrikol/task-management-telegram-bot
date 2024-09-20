@@ -3,6 +3,7 @@ from sqlalchemy import select
 from bot.db.models import User, Task
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import update, and_
+from datetime import date, time, datetime
 
 
 async def add_user(
@@ -38,15 +39,17 @@ async def add_task(
     user_id: int,
     name: str,
     desc: str | None = None,
-    due: str | None = None,
+    _date: date | None = None,
+    _time: time | None = None,
     tag: str | None = None,
-    notice: str | None = None,
+    notice: datetime | None = None,
 ):
     stmt = insert(Task).values(
         {
             Task.name: name,
             Task.desc: desc,
-            Task.due: due,
+            Task.date: _date,
+            Task.time: _time,
             Task.tag: tag,
             Task.notice: notice,
             Task.user_id: user_id,
@@ -62,9 +65,10 @@ async def update_task(
     task_id: int,
     name: str,
     desc: str,
-    due: str,
+    _date: str,
+    _time: str,
     tag: str,
-    notice: str,
+    notice: datetime | None = None,
     status: int = 1,
 ):
     stmt = (
@@ -74,7 +78,8 @@ async def update_task(
             {
                 Task.name: name,
                 Task.desc: desc,
-                Task.due: due,
+                Task.date: _date,
+                Task.time: _time,
                 Task.tag: tag,
                 Task.notice: notice,
                 Task.status: status,
@@ -101,7 +106,7 @@ async def get_tasks_names(session: AsyncSession, user_id: int):
     stmt = select(
         Task.name,
         Task.tag,
-        Task.due,
+        Task.date,
         Task.task_id,
     ).where(and_(Task.user_id == user_id, Task.status == 1))
     res = await session.execute(stmt)

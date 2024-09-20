@@ -1,4 +1,5 @@
 from bot.db.models import Task
+from operator import itemgetter
 from aiogram import Bot
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
@@ -8,7 +9,7 @@ from bot.dialogs.get_tasks.getters import tags
 from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.db.requests import (
     update_task,
@@ -26,10 +27,17 @@ async def listing_tasks(
     **kwargs,
 ):
     session: AsyncSession = manager.middleware_data.get("session")
-    task_id = callback.data.split(":")[1]
-    task: Task = await get_task_info(session, int(task_id))
-    manager.dialog_data.update(task.to_dict())
-    manager.dialog_data.update(task_id=task_id)
+    task_id = int(callback.data.split(":")[1])
+    task: Task = await get_task_info(session, task_id)
+    task = task.to_dict()
+    task["date"] = task["date"].strftime("%d.%m.%Y")
+    task["time"] = task["time"].strftime("%H:%M")
+    task["notice"] = (
+        datetime.strftime(task["notice"], "%d.%m.%Y %H:%M")
+        if task["notice"]
+        else "Отсутствует"
+    )
+    manager.dialog_data.update({**task, "task_id": task_id})
     await manager.switch_to(ShowTasksSG.task_edit)
 
 
@@ -40,21 +48,28 @@ async def edit_task(
 ):
     data: dict = manager.dialog_data
     session: AsyncSession = manager.middleware_data.get("session")
-    print(data)
+    _date = datetime.strptime(data.get("date"), "%d.%m.%Y").date()
+    _time = datetime.strptime(data.get("time"), "%H:%M").time()
+    notice = (
+        datetime.strptime(data.get("notice"), "%d.%m.%Y %H:%M")
+        if data.get("notice") != "Отсутствует"
+        else None
+    )
     await update_task(
         session,
         task_id=int(data.get("task_id")),
         name=data.get("name"),
         desc=data.get("desc"),
         tag=data.get("tag"),
-        due=data.get("due"),
-        notice=data.get("notice"),
+        _date=_date,
+        _time=_time,
+        notice=notice,
     )
     await callback.answer("☑️ Задача сохранена")
     request_result = await get_tasks_names(session, callback.from_user.id)
     manager.dialog_data["task_names"] = []
     for name, tag, date, task_id in request_result:
-        date: str = date[:5]
+        date: str = datetime.strftime(date, "%d.%m")
         name = f"{tags[tag] if tag != '0' else ''} {name} [{date}]"
         manager.dialog_data["task_names"].append((name, str(task_id)))
     await manager.switch_to(ShowTasksSG.start)
@@ -104,7 +119,7 @@ async def edit_date(
     manager: DialogManager,
     selected_date: date,
 ):
-    manager.dialog_data["temp_due"] = str(selected_date.strftime("%d.%m.%Y"))
+    manager.dialog_data["date"] = str(selected_date.strftime("%d.%m.%Y"))
     await manager.switch_to(ShowTasksSG.due_hour)
 
 
@@ -124,14 +139,8 @@ async def save_due_edit(
     manager: DialogManager,
     minute: str,
 ):
-    manager.dialog_data["due"] = (
-        manager.dialog_data["temp_due"]
-        + " "
-        + manager.dialog_data["time"]
-        + ":"
-        + minute
-    )
-    await manager.switch_to(ShowTasksSG.task_edit)  # TODO fix notice
+    manager.dialog_data["time"] = f"{manager.dialog_data['time']}:{minute}"
+    await manager.switch_to(ShowTasksSG.task_edit)
 
 
 async def skip_hours(
@@ -140,8 +149,8 @@ async def skip_hours(
     manager: DialogManager,
 ):
     manager.dialog_data["due"] = (
-        manager.dialog_data["temp_due"] + " " + manager.dialog_data["due"].split(" ")[1]
-    )  # TODO: fix this
+        manager.dialog_data["date"] + " " + manager.dialog_data["time"]
+    )
 
 
 async def edit_notice(
@@ -150,7 +159,7 @@ async def edit_notice(
     manager: DialogManager,
     notice: str,
 ):
-    _date, _time = manager.dialog_data.get("due").split(" ")
+    _date, _time = itemgetter("date", "time")(manager.dialog_data)
     notice: datetime = datetime.strptime(
         str(_date + " " + _time),
         "%d.%m.%Y %H:%M",
