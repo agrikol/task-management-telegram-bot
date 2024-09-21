@@ -1,5 +1,4 @@
-from aiogram import F
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters import CommandStart
 from aiogram_dialog import DialogManager, StartMode

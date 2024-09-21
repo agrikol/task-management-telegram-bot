@@ -103,8 +103,10 @@ async def get_task_info(session: AsyncSession, task_id: int):
 
 
 async def get_tasks_names(session: AsyncSession, user_id: int, today: bool = False):
-    stmt = select(Task.name, Task.tag, Task.date, Task.task_id).where(
-        and_(Task.user_id == user_id, Task.status == 1)
+    stmt = (
+        select(Task.name, Task.tag, Task.date, Task.task_id)
+        .order_by(Task.date)
+        .where(and_(Task.user_id == user_id, Task.status == 1))
     )
     if today:
         stmt = stmt.where(Task.date == date.today())

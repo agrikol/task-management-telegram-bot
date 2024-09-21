@@ -3,6 +3,11 @@ from aiogram.fsm.state import State, StatesGroup
 
 class StartSG(StatesGroup):
     start = State()
+    # admin = State()
+
+
+class AdminSG(StatesGroup):
+    start = State()
 
 
 class CreateTaskSG(StatesGroup):

@@ -1,10 +1,12 @@
 import asyncio, logging
 from aiogram import Bot, Dispatcher
-from bot.handlers import commands
+from bot.handlers.commands import commands_router
+from bot.handlers.admin_command import admin_router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from bot.config.config_reader import config
 from bot.dialogs.start.dialogs import start_dialog
+from bot.dialogs.admin.dialogs import admin_dialog
 from bot.dialogs.create_task.dialogs import create_task_dialog
 from bot.dialogs.get_tasks.dialogs import task_list_dialog
 from aiogram.fsm.storage.redis import RedisStorage
@@ -15,13 +17,14 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import text
 from bot.db.base import Base
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
+from bot.middlewares.middlewares import AdminCheckerMiddleware
 
 
 async def main():
-
     logging.basicConfig(level=logging.INFO)
 
     engine = create_async_engine(url=str(config.db_dsn), echo=config.is_echo)
+    admin_id = config.admin_id.get_secret_value()
 
     async with engine.begin() as conn:
         await conn.execute(text("SELECT 1"))
@@ -35,14 +38,21 @@ async def main():
         key_builder=DefaultKeyBuilder(with_destiny=True),
     )
 
+    admin_router.message.outer_middleware(AdminCheckerMiddleware(admin_ids=[admin_id]))
     dp: Dispatcher = Dispatcher(storage=storage)
-    setup_dialogs(dp)
-
     Sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     dp.update.outer_middleware(DbSessionMiddleware(Sessionmaker))
     dp.message.outer_middleware(CacheMiddleware())
+
+    setup_dialogs(dp)
+
     dp.include_routers(
-        commands.commands_router, start_dialog, create_task_dialog, task_list_dialog
+        commands_router,
+        admin_router,
+        start_dialog,
+        admin_dialog,
+        create_task_dialog,
+        task_list_dialog,
     )
 
     bot: Bot = Bot(
