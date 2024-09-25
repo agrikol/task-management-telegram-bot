@@ -9,6 +9,7 @@ from bot.dialogs.start.dialogs import start_dialog
 from bot.dialogs.admin.dialogs import admin_dialog
 from bot.dialogs.create_task.dialogs import create_task_dialog
 from bot.dialogs.get_tasks.dialogs import task_list_dialog
+from bot.dialogs.feedback.dialogs import feedback_dialog
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram_dialog import setup_dialogs
 from aiogram.fsm.storage.base import DefaultKeyBuilder
@@ -53,6 +54,7 @@ async def main():
         admin_dialog,
         create_task_dialog,
         task_list_dialog,
+        feedback_dialog,
     )
 
     bot: Bot = Bot(
