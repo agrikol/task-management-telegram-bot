@@ -24,7 +24,7 @@ async def main():
     logging.basicConfig(level=logging.INFO)
 
     engine = create_async_engine(url=str(config.db_dsn), echo=config.is_echo)
-    admin_id = config.admin_id.get_secret_value()
+    admin_id = config.admin_id
 
     async with engine.begin() as conn:
         await conn.execute(text("SELECT 1"))
@@ -38,7 +38,7 @@ async def main():
         key_builder=DefaultKeyBuilder(with_destiny=True),
     )
 
-    admin_router.message.outer_middleware(AdminCheckerMiddleware(admin_ids=[admin_id]))
+    admin_router.message.outer_middleware(AdminCheckerMiddleware(admin_ids=admin_id))
     dp: Dispatcher = Dispatcher(storage=storage)
     Sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     dp.update.outer_middleware(DbSessionMiddleware(Sessionmaker))

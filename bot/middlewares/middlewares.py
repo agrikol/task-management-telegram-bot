@@ -4,9 +4,9 @@ from aiogram import BaseMiddleware
 
 
 class AdminCheckerMiddleware(BaseMiddleware):
-    def __init__(self, admin_ids: list[str]) -> None:
+    def __init__(self, admin_ids: list[int]) -> None:
         super().__init__()
-        self.admin_ids = admin_ids
+        self.admin_id = admin_ids
 
     async def __call__(
         self,
@@ -15,13 +15,5 @@ class AdminCheckerMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         event = cast(Message, event)
-        print("!!!!!!!")
-        print(
-            event.from_user.id,
-            self.admin_ids,
-            type(event.from_user.id),
-            type(self.admin_ids),
-        )
-        if str(event.from_user.id) not in self.admin_ids:
-            return
-        return await handler(event, data)
+        if event.from_user.id in self.admin_id:
+            return await handler(event, data)
