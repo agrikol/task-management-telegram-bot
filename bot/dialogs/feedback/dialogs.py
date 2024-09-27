@@ -1,9 +1,9 @@
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
-from aiogram_dialog.widgets.kbd import Button, SwitchTo
+from aiogram_dialog.widgets.kbd import Button
 from aiogram_dialog.widgets.input import TextInput
 from bot.states.states import FeedbackSG
-from bot.dialogs.start.getters import get_start_data
+from bot.dialogs.start.getters import getter_of_start_data
 from bot.dialogs.feedback.handlers import (
     accept_feedback,
     move_to_bug_report,
@@ -21,7 +21,7 @@ feedback_dialog = Dialog(
         Button(Const("Отзыв"), id="feedback", on_click=move_to_feedback),
         Button(Const("Ошибка"), id="bug_report", on_click=move_to_bug_report),
         state=FeedbackSG.start,
-        getter=get_start_data,
+        getter=getter_of_start_data,
     ),
     Window(
         Const("Напишите ваш отзыв:"),

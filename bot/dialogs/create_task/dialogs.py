@@ -37,7 +37,7 @@ create_task_dialog = Dialog(
     Window(
         Format(
             "Имя задачи: <code>{name}</code>\
-            \nОписание: {desc}\nТэг: {tag}\nСрок: {due}\
+            \nОписание: <code>{desc}</code>\nТэг: {tag}\nСрок: {due}\
             \nНапоминание: {notice}"
         ),
         Row(
@@ -48,7 +48,9 @@ create_task_dialog = Dialog(
             SwitchTo(Const("Тэг"), id="tag", state=CreateTaskSG.tag),
             SwitchTo(Const("Срок"), id="due", state=CreateTaskSG.due),
         ),
-        SwitchTo(Const("Напоминание"), id="notice", state=CreateTaskSG.notice),
+        SwitchTo(
+            Const("Напоминание"), id="notice", state=CreateTaskSG.notice, when="is_time"
+        ),
         Button(
             Const("☑️ Сохранить"),
             id="save",

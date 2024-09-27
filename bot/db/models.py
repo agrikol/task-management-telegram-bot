@@ -43,7 +43,7 @@ class Task(TimestampMixin, Base):
     name: Mapped[str] = mapped_column(Text, nullable=False)
     desc: Mapped[str] = mapped_column(Text, nullable=True)
     date: Mapped[Date] = mapped_column(Date, nullable=False)
-    time: Mapped[Time] = mapped_column(Time, nullable=False)
+    time: Mapped[Time] = mapped_column(Time, nullable=True)
     tag: Mapped[str] = mapped_column(Text, nullable=False)
     notice: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
     user_id: Mapped[int] = mapped_column(

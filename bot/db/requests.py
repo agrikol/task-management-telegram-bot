@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from bot.db.models import User, Task
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import update, and_
+from sqlalchemy import update, and_, func
 from datetime import date, time, datetime
 
 
@@ -105,7 +105,7 @@ async def get_task_info(session: AsyncSession, task_id: int):
 async def get_tasks_names(session: AsyncSession, user_id: int, today: bool = False):
     stmt = (
         select(Task.name, Task.tag, Task.date, Task.task_id)
-        .order_by(Task.date)
+        .order_by(Task.date, Task.time)
         .where(and_(Task.user_id == user_id, Task.status == 1))
     )
     if today:
@@ -120,3 +120,15 @@ async def check_tasks_exist(session: AsyncSession, user_id: int):
     tasks_exist = res.scalars().all()
     today_exists = any(date.today() == task.date for task in tasks_exist)
     return bool(tasks_exist), today_exists
+
+
+async def get_userlist_db(session: AsyncSession):
+    stmt = select(User.telegram_id, User.first_name, User.username)
+    res = await session.execute(stmt)
+    return res.fetchall()
+
+
+async def get_tasks_count_db(session: AsyncSession):
+    stmt = select(func.count()).select_from(Task)
+    res = await session.execute(stmt)
+    return res.scalar()

@@ -20,6 +20,7 @@ async def getter_of_task(
     tag = tags.get(data.get("tag"))
     data["tag"] = tag
     data["due"] = f"{data['date']} {data['time']}"
+    data["is_time"] = data.get("time")
     return data
 
 

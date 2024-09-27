@@ -13,4 +13,4 @@ async def process_admin_command(
     message: Message,
     dialog_manager: DialogManager,
 ) -> None:
-    await dialog_manager.start(AdminSG.start)
+    await dialog_manager.start(AdminSG.start, mode=StartMode.NORMAL)

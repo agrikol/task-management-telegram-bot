@@ -1,9 +1,12 @@
 import asyncio, logging
+from sqlalchemy import text
+from redis.asyncio import Redis
 from aiogram import Bot, Dispatcher
+from aiogram.enums import ParseMode
+from aiogram_dialog import setup_dialogs
 from bot.handlers.commands import commands_router
 from bot.handlers.admin_command import admin_router
 from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
 from bot.config.config_reader import config
 from bot.dialogs.start.dialogs import start_dialog
 from bot.dialogs.admin.dialogs import admin_dialog
@@ -11,11 +14,8 @@ from bot.dialogs.create_task.dialogs import create_task_dialog
 from bot.dialogs.get_tasks.dialogs import task_list_dialog
 from bot.dialogs.feedback.dialogs import feedback_dialog
 from aiogram.fsm.storage.redis import RedisStorage
-from aiogram_dialog import setup_dialogs
 from aiogram.fsm.storage.base import DefaultKeyBuilder
-from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy import text
 from bot.db.base import Base
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
 from bot.middlewares.middlewares import AdminCheckerMiddleware

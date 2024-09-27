@@ -16,12 +16,12 @@ async def get_template(
     **kwargs,
 ) -> dict[str, str]:
     dialog_data = dialog_manager.dialog_data
-    name = f"<b>{dialog_data.setdefault('name', 'Новая')}</b>"
-    desc = f"<i>{dialog_data.setdefault('desc', 'Отсутствует')}</i>"
+    name = f"{dialog_data.setdefault('name', 'Новая')}"
+    desc = f"{dialog_data.setdefault('desc', 'Отсутствует')}"
     _date = dialog_data.setdefault(
         "date", (date.today() + timedelta(days=1)).strftime("%d.%m.%Y")
     )
-    _time = dialog_data.setdefault("time", "12:00")
+    _time = dialog_data.setdefault("time", "")
     tag = tags.get(dialog_data.setdefault("tag", "0"))
     notice: str | None = dialog_data.get("notice")
     notice = notice if notice else "Отсутствует"
@@ -31,6 +31,7 @@ async def get_template(
         "due": f"{_date} {_time}",
         "tag": tag,
         "notice": notice,
+        "is_time": _time != "",
     }
 
 

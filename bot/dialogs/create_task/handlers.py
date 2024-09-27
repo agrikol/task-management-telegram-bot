@@ -114,6 +114,12 @@ async def save_task(
 ):
     data: dict = manager.dialog_data
     session: AsyncSession = manager.middleware_data.get("session")
+    _date: date = datetime.strptime(data.get("date"), "%d.%m.%Y").date()
+    _time = (
+        datetime.strptime(data.get("time"), "%H:%M").time()
+        if data.get("time")
+        else None
+    )
     notice: str | None = (
         datetime.strptime(data.get("notice"), "%d.%m.%Y %H:%M")
         if data.get("notice")
@@ -125,8 +131,8 @@ async def save_task(
         name=data.get("name"),
         desc=data.get("desc"),
         tag=data.get("tag", "0"),
-        _date=datetime.strptime(data.get("date"), "%d.%m.%Y").date(),
-        _time=datetime.strptime(data.get("time"), "%H:%M").time(),
+        _date=_date,
+        _time=_time,
         notice=notice,
     )
     await callback.answer("☑️ Задача сохранена")
@@ -138,4 +144,4 @@ async def clear_hours(
     widget: SwitchTo,
     manager: DialogManager,
 ):
-    manager.dialog_data["time"] = "12:00"
+    manager.dialog_data["time"] = ""

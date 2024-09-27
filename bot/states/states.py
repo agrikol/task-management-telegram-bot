@@ -8,6 +8,8 @@ class StartSG(StatesGroup):
 
 class AdminSG(StatesGroup):
     start = State()
+    userlist = State()
+    task_count = State()
 
 
 class CreateTaskSG(StatesGroup):

@@ -1,7 +1,6 @@
 from aiogram import Bot
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import DialogManager
-from aiogram_dialog.widgets.kbd import Button
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Text
 from bot.states.states import FeedbackSG
@@ -36,8 +35,8 @@ async def accept_feedback(
         for admin_id in admin_ids:
             await bot.send_message(
                 admin_id,
-                f"Новый {feedack_type}\nот {message.from_user.full_name} "
-                "{message.from_user.id}:\n{text}",
+                f"Новый {feedack_type}\nот {message.from_user.username} "
+                f"{message.from_user.id}:\n{text}",
             )
     except Exception as e:
         pass  # TODO add logger

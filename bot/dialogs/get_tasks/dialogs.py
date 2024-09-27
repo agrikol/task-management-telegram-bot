@@ -60,7 +60,7 @@ task_list_dialog = Dialog(
     Window(
         Format(
             "Имя задачи: <code>{name}</code>\
-            \nОписание: {desc}\nТэг: {tag}\nСрок: {due}\
+            \nОписание: <code>{desc}</code>\nТэг: {tag}\nСрок: {due}\
             \nНапоминание: {notice}"
         ),
         Row(
@@ -71,7 +71,9 @@ task_list_dialog = Dialog(
             SwitchTo(Const("Тэг"), id="tag", state=ShowTasksSG.tag),
             SwitchTo(Const("Срок"), id="due", state=ShowTasksSG.due),
         ),
-        SwitchTo(Const("Напоминание"), id="notice", state=ShowTasksSG.notice),
+        SwitchTo(
+            Const("Напоминание"), id="notice", state=ShowTasksSG.notice, when="is_time"
+        ),
         Row(
             Button(Const("❌ Удалить"), id="delete", on_click=delete_task),
             Button(
