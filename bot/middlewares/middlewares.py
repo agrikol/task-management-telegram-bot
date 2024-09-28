@@ -15,5 +15,6 @@ class AdminCheckerMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         event = cast(Message, event)
-        if event.from_user.id in self.admin_id:
-            return await handler(event, data)
+        if event.from_user.id not in self.admin_id and event.text.startswith("/admin"):
+            return
+        return await handler(event, data)

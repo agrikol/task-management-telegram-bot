@@ -39,11 +39,11 @@ async def main():
         key_builder=DefaultKeyBuilder(with_destiny=True),
     )
 
-    admin_router.message.outer_middleware(AdminCheckerMiddleware(admin_ids=admin_id))
     dp: Dispatcher = Dispatcher(storage=storage)
     Sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     dp.update.outer_middleware(DbSessionMiddleware(Sessionmaker))
     dp.message.outer_middleware(CacheMiddleware())
+    admin_router.message.outer_middleware(AdminCheckerMiddleware(admin_ids=admin_id))
 
     setup_dialogs(dp)
 
