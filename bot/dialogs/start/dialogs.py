@@ -16,7 +16,6 @@ start_dialog = Dialog(
             "🤖 Привет {name}, я - робот <b>MAKE-E</b>!\
             \nНачнем планирование?"
         ),
-        Format("{intro}"),
         Row(
             Button(Const("Создать задачу"), id="new_task", on_click=start_create_task),
             Button(
