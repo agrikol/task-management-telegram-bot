@@ -4,7 +4,6 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.text import Text
 from bot.states.states import FeedbackSG
-from bot.config.config_reader import config
 
 
 async def move_to_bug_report(
@@ -25,8 +24,8 @@ async def accept_feedback(
     message: Message, widget: TextInput, manager: DialogManager, text: Text
 ):
     bot: Bot = manager.middleware_data["bot"]
-    admin_ids: list = config.admin_id
-    feedack_type = manager.dialog_data.get("feedback_type")
+    admin_ids: list = manager.middleware_data["admin_ids"]
+    feedack_type: str = manager.dialog_data.get("feedback_type")
     try:
         await bot.delete_messages(
             message.chat.id,
