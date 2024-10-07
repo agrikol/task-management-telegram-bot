@@ -93,11 +93,13 @@ task_list_dialog = Dialog(
             id="edit_name",
             on_success=edit_name_handler,
         ),
+        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
         state=ShowTasksSG.name,
     ),
     Window(
         Const("Введите новое описание задачи:"),
         TextInput(id="edit_desc", on_success=edit_desc_handler),
+        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
         state=ShowTasksSG.desc,
     ),
     Window(

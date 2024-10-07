@@ -66,11 +66,13 @@ create_task_dialog = Dialog(
             id="add_name",
             on_success=add_name_handler,
         ),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
         state=CreateTaskSG.name,
     ),
     Window(
         Const("Введите описание задачи:"),
         TextInput(id="add_desc", on_success=add_desc_handler),
+        SwitchTo(Const("« Назад"), id="cancel", state=CreateTaskSG.start),
         state=CreateTaskSG.desc,
     ),
     Window(

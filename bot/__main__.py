@@ -11,7 +11,7 @@ from redis.asyncio import Redis
 from bot.db.base import Base
 from bot.handlers.commands import commands_router
 from bot.handlers.admin_command import admin_router
-from bot.config.config_reader import config
+from bot.config.config_reader import Settings
 from bot.dialogs.start.dialogs import start_dialog
 from bot.dialogs.admin.dialogs import admin_dialog
 from bot.dialogs.create_task.dialogs import create_task_dialog
@@ -23,6 +23,7 @@ from bot.middlewares.middlewares import AdminCheckerMiddleware
 
 async def main():
     logging.basicConfig(level=logging.INFO)
+    config = Settings()
 
     engine = create_async_engine(url=str(config.db_dsn), echo=config.is_echo)
     admin_ids = config.admin_id

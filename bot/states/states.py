@@ -10,6 +10,7 @@ class AdminSG(StatesGroup):
     start = State()
     userlist = State()
     task_count = State()
+    message = State()
 
 
 class CreateTaskSG(StatesGroup):
