@@ -1,5 +1,5 @@
 from datetime import datetime
-from bot.db.base import Base
+from bot.db import Base
 from sqlalchemy import (
     BigInteger,
     Integer,
@@ -30,6 +30,7 @@ class User(TimestampMixin, Base):
     first_name: Mapped[str] = mapped_column(Text, nullable=False)
     username: Mapped[str] = mapped_column(Text, nullable=True)
     last_name: Mapped[str] = mapped_column(Text, nullable=True)
+    timezone: Mapped[str] = mapped_column(Text, nullable=True)
 
     task: Mapped[list["Task"]] = relationship(
         "Task", back_populates="user", cascade="delete"
