@@ -34,6 +34,16 @@ async def add_user(
     await session.commit()
 
 
+async def add_user_timezone(
+    session: AsyncSession,
+    telegram_id: int,
+    timezone: str,
+):
+    stmt = update(User).where(User.telegram_id == telegram_id).values(timezone=timezone)
+    await session.execute(stmt)
+    await session.commit()
+
+
 async def add_task(
     session: AsyncSession,
     user_id: int,
