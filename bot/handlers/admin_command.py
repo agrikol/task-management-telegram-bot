@@ -1,8 +1,8 @@
-from aiogram import F, Router
+from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram_dialog import DialogManager, StartMode
-from bot.states.states import StartSG, AdminSG
+from bot.states.states import AdminSG
 
 
 admin_router: Router = Router()

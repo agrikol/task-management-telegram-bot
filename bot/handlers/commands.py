@@ -1,5 +1,4 @@
 from aiogram import Router, F
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.types import (
     Message,
     ReplyKeyboardMarkup,
