@@ -10,3 +10,5 @@ tests/
 bot/db/temp_tasks.db
 bot/db/temp_users.db
 .DS_Store
+nui
+nats/data

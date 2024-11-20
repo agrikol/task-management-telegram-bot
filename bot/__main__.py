@@ -19,15 +19,23 @@ from bot.dialogs.get_tasks.dialogs import task_list_dialog
 from bot.dialogs.feedback.dialogs import feedback_dialog
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
 from bot.middlewares.middlewares import AdminCheckerMiddleware
+from bot.utils.nats_connect import connect_nats
+from bot.utils.start_stream import create_stream
+from bot.utils.start_consumer import start_delayed_consumer
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 async def main():
-    logging.basicConfig(level=logging.INFO)
     config = Settings()
-
-    engine = create_async_engine(url=str(config.db_dsn), echo=config.is_echo)
     admin_ids = config.admin_id
 
+    engine = create_async_engine(url=str(config.db_dsn), echo=config.is_echo)
     async with engine.begin() as conn:
         await conn.execute(text("SELECT 1"))
 
@@ -47,8 +55,15 @@ async def main():
     admin_router.message.outer_middleware(AdminCheckerMiddleware(admin_ids=admin_ids))
     dp.workflow_data.update({"admin_ids": admin_ids})
 
-    setup_dialogs(dp)
+    nc, js = await connect_nats(servers=config.nats_servers)
+    stream = await create_stream(
+        js=js,
+        stream_name=config.nats_delayed_consumer_stream,
+        subjects=[config.nats_delayed_consumer_subject],
+    )
+    logger.info(stream)
 
+    setup_dialogs(dp)
     dp.include_routers(
         commands_router,
         admin_router,
@@ -63,7 +78,26 @@ async def main():
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
     await bot.delete_webhook(drop_pending_updates=True)
-    await asyncio.gather(dp.start_polling(bot, allowed_updates=[]))
+    try:
+        await asyncio.gather(
+            dp.start_polling(
+                bot, js=js, delay_del_subject=config.nats_delayed_consumer_subject
+            ),
+            start_delayed_consumer(
+                nc=nc,
+                js=js,
+                bot=bot,
+                subject=config.nats_delayed_consumer_subject,
+                stream=config.nats_delayed_consumer_stream,
+                durable_name=config.nats_delayed_consumer_durable_name,
+            ),
+        )
+    except Exception as e:
+        logger.error(e)
+    finally:
+        await nc.close()
+        await engine.dispose()
+        logger.info("Bot stopped")
 
 
 if __name__ == "__main__":

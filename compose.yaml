@@ -11,6 +11,7 @@ services:
     depends_on:
       - redis_fsm
       - postgres
+      - nats
 
   redis_fsm:
     image: "redis:7"
@@ -46,6 +47,27 @@ services:
       - "01-simple-alchemy-pgadmin:/var/lib/pgadmin"
     depends_on:
       - postgres
+
+  nats:
+    image: nats:latest
+    entrypoint: /nats-server
+    command: "-c /config/server.conf"
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ./nats/data:/data
+      - ./nats/config/server.conf:/config/server.conf
+
+  nats-nui:
+    image: ghcr.io/nats-nui/nui:latest
+    container_name: nats-nui
+    ports:
+      - "31311:31311"
+    volumes:
+      - ./nui/db:/db
+    depends_on:
+      - nats
 
 volumes:
   01-simple-alchemy-pgadmin:
