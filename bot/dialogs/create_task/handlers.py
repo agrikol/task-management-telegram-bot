@@ -1,3 +1,4 @@
+import pytz
 from aiogram import Bot
 from datetime import datetime, date
 from aiogram.types import CallbackQuery
@@ -9,8 +10,8 @@ from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
-from bot.db.requests import add_task
-from bot.service.delay_services.publisher import delay_message_deletion
+from bot.db.requests import add_task, get_user_timezone
+from bot.service.delay_services.publisher import publish_delay
 from nats.js.client import JetStreamContext
 
 
@@ -118,15 +119,15 @@ async def save_task(
     session: AsyncSession = manager.middleware_data.get("session")
     js: JetStreamContext = manager.middleware_data.get("js")
     subject: str = manager.middleware_data.get("delay_del_subject")
+
     _date: date = datetime.strptime(data.get("date"), "%d.%m.%Y").date()
     _time = (
         datetime.strptime(data.get("time"), "%H:%M").time()
         if data.get("time")
         else None
     )
-    notice: float | None = (
-        datetime.strptime(data.get("notice"), "%d.%m.%Y %H:%M").timestamp()
-        - datetime.now().astimezone().timestamp()
+    notice: datetime | None = (
+        datetime.strptime(data.get("notice"), "%d.%m.%Y %H:%M")
         if data.get("notice")
         else None
     )
@@ -139,12 +140,18 @@ async def save_task(
         tag=data.get("tag", "0"),
         _date=_date,
         _time=_time,
-        notice=None,
+        notice=notice,
     )
     await callback.answer("☑️ Задача сохранена")
-    await delay_message_deletion(
-        js, callback.message.chat.id, subject=subject, delay=notice
-    )
+
+    if notice:
+        await publish_delay(
+            js=js,
+            session=session,
+            user_id=callback.from_user.id,
+            subject=subject,
+            delay=notice,
+        )
     await manager.done()
 
 

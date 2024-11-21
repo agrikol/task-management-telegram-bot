@@ -29,12 +29,12 @@ async def listing_tasks(
     session: AsyncSession = manager.middleware_data.get("session")
     task_id = int(callback.data.split(":")[1])
     task: Task = await get_task_info(session, task_id)
-    task = task.to_dict()
+    task: dict = task.to_dict()
     task["date"] = task["date"].strftime("%d.%m.%Y")
     task["time"] = task["time"].strftime("%H:%M") if task["time"] else ""
     task["notice"] = (
         datetime.strftime(task["notice"], "%d.%m.%Y %H:%M")
-        if task["notice"]
+        if task.get("notice")
         else "Отсутствует"
     )
     manager.dialog_data.update({**task, "task_id": task_id})
@@ -70,7 +70,7 @@ async def edit_task(
         notice=notice,
     )
     await callback.answer("☑️ Задача сохранена")
-    request_result = await get_tasks_names(session, callback.from_user.id)
+    # request_result = await get_tasks_names(session, callback.from_user.id)
     # manager.dialog_data["task_names"] = []
     # for name, tag, date, task_id in request_result:
     #     date: str = datetime.strftime(date, "%d.%m")

@@ -44,6 +44,13 @@ async def add_user_timezone(
     await session.commit()
 
 
+async def get_user_timezone(session: AsyncSession, telegram_id: int):
+    stmt = select(User.timezone).where(User.telegram_id == telegram_id)
+    res = await session.execute(stmt)
+    tz: str = res.scalar() or "Europe/Moscow"
+    return tz
+
+
 async def add_task(
     session: AsyncSession,
     user_id: int,

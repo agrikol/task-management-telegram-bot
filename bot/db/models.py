@@ -60,7 +60,7 @@ class Task(TimestampMixin, Base):
         Date: {self.date}, Time: {self.time}, Tag: {self.tag}, Notice: {self.notice},\
         Status: {self.status}"
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             "name": self.name,
             "desc": self.desc,

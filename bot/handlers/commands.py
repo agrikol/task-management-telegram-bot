@@ -11,6 +11,7 @@ from bot.states.states import StartSG, FeedbackSG
 from bot.db.requests import add_user, add_user_timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from timezonefinder import TimezoneFinder
+import pytz
 
 commands_router: Router = Router()
 
@@ -48,7 +49,8 @@ async def process_location_command(message: Message) -> None:
         keyboard=[[location_btn], [cancel_btn]], resize_keyboard=True
     )
     await message.answer(
-        "Please, share your location:",
+        "Нажмите на кнопку. Бот не хранит ваше местоположение и"
+        "использует его один раз только для определения часового пояса",
         reply_markup=keyboard,
     )
 
@@ -63,7 +65,7 @@ async def process_location(message: Message, session: AsyncSession) -> None:
     )
     await add_user_timezone(session, message.from_user.id, timezone)
     await message.answer(
-        f"Timezone: {timezone}",
+        f"Ваш часовой пояс: {timezone}",
         reply_markup=ReplyKeyboardRemove(),
     )
 
@@ -72,5 +74,8 @@ async def process_location(message: Message, session: AsyncSession) -> None:
 async def process_cancel(message: Message, dialog_manager: DialogManager) -> None:
     # TODO: Refactor this
     await message.delete()
-    await message.answer("Thanks for using me!", reply_markup=ReplyKeyboardRemove())
+    await message.answer(
+        "Вы сможете установить /timezone в следующий раз",
+        reply_markup=ReplyKeyboardRemove(),
+    )
     await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)
