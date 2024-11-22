@@ -53,10 +53,11 @@ class DelayedMessageConsumer:
             await msg.nak(delay=new_delay)
         else:
             chat_id = int(msg.headers.get("Tg-Delayed-Chat-ID"))
+            task_id = msg.headers.get("Tg-Delayed-Task-ID")
             with suppress(TelegramBadRequest):
                 await self.bot.send_message(
                     chat_id=chat_id,
-                    text="Отложенное сообщение",
+                    text=f"Отложенное сообщение {task_id}",
                     reply_markup=notice_kb(),
                 )
             await msg.ack()

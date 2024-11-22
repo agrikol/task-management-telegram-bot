@@ -60,21 +60,26 @@ async def add_task(
     _time: time | None = None,
     tag: str | None = None,
     notice: datetime | None = None,
-):
-    stmt = insert(Task).values(
-        {
-            Task.name: name,
-            Task.desc: desc,
-            Task.date: _date,
-            Task.time: _time,
-            Task.tag: tag,
-            Task.notice: notice,
-            Task.user_id: user_id,
-        }
+) -> int:
+    stmt = (
+        insert(Task)
+        .values(
+            {
+                Task.name: name,
+                Task.desc: desc,
+                Task.date: _date,
+                Task.time: _time,
+                Task.tag: tag,
+                Task.notice: notice,
+                Task.user_id: user_id,
+            }
+        )
+        .returning(Task.task_id)
     )
-    stmt = stmt.on_conflict_do_nothing()
-    await session.execute(stmt)
+    # stmt = stmt.on_conflict_do_nothing()
+    result = await session.execute(stmt)
     await session.commit()
+    return result.scalar()
 
 
 async def update_task(

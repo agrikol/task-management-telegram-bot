@@ -11,6 +11,7 @@ async def publish_delay(
     user_id: int,
     subject: str,
     delay: datetime,
+    task_id: int,
 ):
     utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
     tz: str = await get_user_timezone(session, user_id)
@@ -20,6 +21,7 @@ async def publish_delay(
         "Tg-Delayed-Chat-ID": str(user_id),
         "Tg-Delayed-Msg-Timestamp": str(datetime.now().timestamp()),
         "Tg-Delayed-Msg-Delay": str(delay),
+        "Tg-Delayed-Task-ID": str(task_id),
     }
 
     await js.publish(subject, headers=headers)

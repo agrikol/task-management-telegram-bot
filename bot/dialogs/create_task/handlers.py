@@ -71,6 +71,7 @@ async def select_date(
     selected_date: date,
 ):
     manager.dialog_data["date"] = str(selected_date.strftime("%d.%m.%Y"))
+    manager.dialog_data["notice"] = None
     await manager.switch_to(CreateTaskSG.due_hour)
 
 
@@ -132,7 +133,7 @@ async def save_task(
         else None
     )
 
-    await add_task(
+    task_id = await add_task(
         session,
         user_id=callback.from_user.id,
         name=data.get("name"),
@@ -149,6 +150,7 @@ async def save_task(
             js=js,
             session=session,
             user_id=callback.from_user.id,
+            task_id=task_id,
             subject=subject,
             delay=notice,
         )

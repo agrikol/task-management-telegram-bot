@@ -3,6 +3,7 @@ from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
 from bot.dialogs.create_task.getters import get_hours, get_minutes, get_notice
+from bot.dialogs.create_task.handlers import clear_hours
 from aiogram_dialog.widgets.kbd import (
     SwitchTo,
     Row,
@@ -161,7 +162,7 @@ task_list_dialog = Dialog(
         Back(
             Const("« Назад"),
             id="to_edit_hour",
-            on_click=skip_hours,
+            on_click=clear_hours,
         ),
         getter=get_minutes,
         state=ShowTasksSG.due_minute,

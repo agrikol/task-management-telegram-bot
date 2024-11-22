@@ -16,11 +16,13 @@ async def getter_of_names(dialog_manager: DialogManager, **kwargs):
 async def getter_of_task(
     dialog_manager: DialogManager, event_from_user: User, **kwargs
 ):
-    data = dialog_manager.dialog_data.copy()
+    data = dialog_manager.dialog_data.copy()  # TODO: fix
     tag = tags.get(data.get("tag"))
     data["tag"] = tag
     data["due"] = f"{data['date']} {data['time']}"
     data["is_time"] = data.get("time")
+    notice: str | None = data.get("notice")
+    data["notice"] = notice if notice else "Отсутствует"
     return data
 
 

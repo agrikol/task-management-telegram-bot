@@ -35,7 +35,7 @@ async def listing_tasks(
     task["notice"] = (
         datetime.strftime(task["notice"], "%d.%m.%Y %H:%M")
         if task.get("notice")
-        else "Отсутствует"
+        else None
     )
     manager.dialog_data.update({**task, "task_id": task_id})
     await manager.switch_to(ShowTasksSG.task_edit)
@@ -56,7 +56,7 @@ async def edit_task(
     )
     notice = (
         datetime.strptime(data.get("notice"), "%d.%m.%Y %H:%M")
-        if data.get("notice") != "Отсутствует"
+        if data.get("notice")
         else None
     )
     await update_task(
@@ -124,6 +124,7 @@ async def edit_date(
     selected_date: date,
 ):
     manager.dialog_data["date"] = str(selected_date.strftime("%d.%m.%Y"))
+    manager.dialog_data["notice"] = None
     await manager.switch_to(ShowTasksSG.due_hour)
 
 
