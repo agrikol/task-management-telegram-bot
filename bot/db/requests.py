@@ -124,6 +124,12 @@ async def get_task_info(session: AsyncSession, task_id: int):
     return res.scalar()
 
 
+async def get_task_short_info(session: AsyncSession, task_id: int):
+    stmt = select(Task.name, Task.desc).where(Task.task_id == task_id)
+    res = await session.execute(stmt)
+    return res.first()
+
+
 async def get_tasks_names(session: AsyncSession, user_id: int, today: bool = False):
     stmt = (
         select(Task.name, Task.tag, Task.date, Task.task_id)

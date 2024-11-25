@@ -1,4 +1,5 @@
 from aiogram_dialog import DialogManager
+from datetime import datetime
 from aiogram.types import User
 from bot.dialogs.create_task.getters import tags
 
@@ -17,12 +18,12 @@ async def getter_of_task(
     dialog_manager: DialogManager, event_from_user: User, **kwargs
 ):
     data = dialog_manager.dialog_data.copy()  # TODO: fix
-    tag = tags.get(data.get("tag"))
-    data["tag"] = tag
-    data["due"] = f"{data['date']} {data['time']}"
+    # if dialog_manager.start_data:
+    #     data = dialog_manager.start_data
+    data["tag"] = tags.get(data.get("tag"))
+    data["due"] = f"{data['date']} {data['time']}".strip()
     data["is_time"] = data.get("time")
-    notice: str | None = data.get("notice")
-    data["notice"] = notice if notice else "Отсутствует"
+    data["notice"] = data.get("notice") or "Отсутствует"
     return data
 
 

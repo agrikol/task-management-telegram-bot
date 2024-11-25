@@ -1,17 +1,20 @@
 from aiogram import Router, F
 from aiogram.types import (
     Message,
+    CallbackQuery,
     ReplyKeyboardMarkup,
     KeyboardButton,
     ReplyKeyboardRemove,
 )
 from aiogram.filters import CommandStart, Command
 from aiogram_dialog import DialogManager, StartMode
-from bot.states.states import StartSG, FeedbackSG
-from bot.db.requests import add_user, add_user_timezone
+from bot.states.states import StartSG, FeedbackSG, EditTasksSG
+from bot.db.requests import add_user, add_user_timezone, get_task_info
 from sqlalchemy.ext.asyncio import AsyncSession
 from timezonefinder import TimezoneFinder
+from bot.db.models import Task
 import pytz
+from datetime import datetime
 
 commands_router: Router = Router()
 
@@ -30,6 +33,23 @@ async def process_start_command(
         message.from_user.last_name,
     )
     await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)
+
+
+@commands_router.callback_query(F.data.startswith("notice:edit:"))
+async def process_edit_notice(callback: CallbackQuery, dialog_manager: DialogManager):
+    print("!!!!!!!!!")
+    print("!!!!!!!!!")
+    print("!!!!!!!!!")
+    session: AsyncSession = dialog_manager.middleware_data.get("session")
+    task_id = int(callback.data.split(":")[-1])
+    task: Task = await get_task_info(session, task_id)
+    task: dict = task.to_dict()
+    print(task)
+    await dialog_manager.start(
+        EditTasksSG.task_edit,
+        data={**task, "task_id": task_id},
+        mode=StartMode.NEW_STACK,
+    )
 
 
 @commands_router.message(Command("feedback"))

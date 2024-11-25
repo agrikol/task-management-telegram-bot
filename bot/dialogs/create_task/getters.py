@@ -1,5 +1,5 @@
 from aiogram_dialog import DialogManager
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 
 
 tags: dict = {

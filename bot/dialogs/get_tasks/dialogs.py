@@ -15,7 +15,7 @@ from aiogram_dialog.widgets.kbd import (
     Group,
     Calendar,
 )
-from bot.states.states import ShowTasksSG
+from bot.states.states import EditTasksSG
 from bot.dialogs.get_tasks.handlers import (
     listing_tasks,
     edit_task,
@@ -55,7 +55,7 @@ task_list_dialog = Dialog(
             id="task_list",
         ),
         Cancel(Const("« Назад"), id="cancel"),
-        state=ShowTasksSG.start,
+        state=EditTasksSG.start,
         getter=getter_of_names,
     ),
     Window(
@@ -65,15 +65,15 @@ task_list_dialog = Dialog(
             \nНапоминание: {notice}"
         ),
         Row(
-            SwitchTo(Const("Имя"), id="name", state=ShowTasksSG.name),
-            SwitchTo(Const("Описание"), id="desc", state=ShowTasksSG.desc),
+            SwitchTo(Const("Имя"), id="name", state=EditTasksSG.name),
+            SwitchTo(Const("Описание"), id="desc", state=EditTasksSG.desc),
         ),
         Row(
-            SwitchTo(Const("Тэг"), id="tag", state=ShowTasksSG.tag),
-            SwitchTo(Const("Срок"), id="due", state=ShowTasksSG.due),
+            SwitchTo(Const("Тэг"), id="tag", state=EditTasksSG.tag),
+            SwitchTo(Const("Срок"), id="due", state=EditTasksSG.due),
         ),
         SwitchTo(
-            Const("Напоминание"), id="notice", state=ShowTasksSG.notice, when="is_time"
+            Const("Напоминание"), id="notice", state=EditTasksSG.notice, when="is_time"
         ),
         Row(
             Button(Const("❌ Удалить"), id="delete", on_click=delete_task),
@@ -85,7 +85,7 @@ task_list_dialog = Dialog(
             Button(Const("✅ Выполнено"), id="done", on_click=complete_task),
         ),
         Back(Const("« Назад"), id="to_list"),
-        state=ShowTasksSG.task_edit,
+        state=EditTasksSG.task_edit,
         getter=getter_of_task,
     ),
     Window(
@@ -94,14 +94,14 @@ task_list_dialog = Dialog(
             id="edit_name",
             on_success=edit_name_handler,
         ),
-        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
-        state=ShowTasksSG.name,
+        SwitchTo(Const("« Назад"), id="to_edit", state=EditTasksSG.task_edit),
+        state=EditTasksSG.name,
     ),
     Window(
         Const("Введите новое описание задачи:"),
         TextInput(id="edit_desc", on_success=edit_desc_handler),
-        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
-        state=ShowTasksSG.desc,
+        SwitchTo(Const("« Назад"), id="to_edit", state=EditTasksSG.task_edit),
+        state=EditTasksSG.desc,
     ),
     Window(
         Const("Выберите тэг:"),
@@ -115,15 +115,15 @@ task_list_dialog = Dialog(
             ),
             width=1,
         ),
-        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
-        state=ShowTasksSG.tag,
+        SwitchTo(Const("« Назад"), id="to_edit", state=EditTasksSG.task_edit),
+        state=EditTasksSG.tag,
         getter=getter_of_tag,
     ),
     Window(
         Const("Выберите дату:"),
         Calendar(id="edit_date", on_click=edit_date),
-        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
-        state=ShowTasksSG.due,
+        SwitchTo(Const("« Назад"), id="to_edit", state=EditTasksSG.task_edit),
+        state=EditTasksSG.due,
     ),
     Window(
         Const("Выберите час:"),
@@ -140,12 +140,12 @@ task_list_dialog = Dialog(
         SwitchTo(
             Const("Пропустить »"),
             id="skip_time",
-            state=ShowTasksSG.task_edit,
+            state=EditTasksSG.task_edit,
             on_click=skip_hours,
         ),
         Back(Const("« Назад"), id="to_edit_date"),
         getter=get_hours,
-        state=ShowTasksSG.due_hour,
+        state=EditTasksSG.due_hour,
     ),
     Window(
         Const("Выберите минуты:"),
@@ -165,7 +165,7 @@ task_list_dialog = Dialog(
             on_click=clear_hours,
         ),
         getter=get_minutes,
-        state=ShowTasksSG.due_minute,
+        state=EditTasksSG.due_minute,
     ),
     Window(
         Const("Когда прислать напоминание?"),  # TODO: Checkbox
@@ -179,8 +179,8 @@ task_list_dialog = Dialog(
             ),
             width=4,
         ),
-        SwitchTo(Const("« Назад"), id="to_edit", state=ShowTasksSG.task_edit),
-        state=ShowTasksSG.notice,
+        SwitchTo(Const("« Назад"), id="to_edit", state=EditTasksSG.task_edit),
+        state=EditTasksSG.notice,
         getter=get_notice,
     ),
 )

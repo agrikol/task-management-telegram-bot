@@ -4,7 +4,7 @@ from aiogram import Bot
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Select
-from bot.states.states import ShowTasksSG
+from bot.states.states import EditTasksSG
 from bot.dialogs.get_tasks.getters import tags
 from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
@@ -15,7 +15,6 @@ from bot.db.requests import (
     update_task,
     get_task_info,
     change_status_db,
-    get_tasks_names,
 )
 
 
@@ -38,7 +37,7 @@ async def listing_tasks(
         else None
     )
     manager.dialog_data.update({**task, "task_id": task_id})
-    await manager.switch_to(ShowTasksSG.task_edit)
+    await manager.switch_to(EditTasksSG.task_edit)
 
 
 async def edit_task(
@@ -90,7 +89,7 @@ async def edit_name_handler(
         )
     except Exception as e:
         pass  # TODO add logger
-    await manager.switch_to(ShowTasksSG.task_edit)
+    await manager.switch_to(EditTasksSG.task_edit)
 
 
 async def edit_desc_handler(
@@ -104,7 +103,7 @@ async def edit_desc_handler(
         )
     except Exception as e:
         pass  # TODO add logger
-    await manager.switch_to(ShowTasksSG.task_edit)
+    await manager.switch_to(EditTasksSG.task_edit)
 
 
 async def edit_tag(
@@ -114,7 +113,7 @@ async def edit_tag(
     *args,
 ) -> None:
     manager.dialog_data.update(tag=callback.data.split(":")[1])
-    await manager.switch_to(ShowTasksSG.task_edit)
+    await manager.switch_to(EditTasksSG.task_edit)
 
 
 async def edit_date(
@@ -125,7 +124,7 @@ async def edit_date(
 ):
     manager.dialog_data["date"] = str(selected_date.strftime("%d.%m.%Y"))
     manager.dialog_data["notice"] = None
-    await manager.switch_to(ShowTasksSG.due_hour)
+    await manager.switch_to(EditTasksSG.due_hour)
 
 
 async def edit_hour(
@@ -135,7 +134,7 @@ async def edit_hour(
     hour: str,
 ):
     manager.dialog_data["time"] = hour
-    await manager.switch_to(ShowTasksSG.due_minute)
+    await manager.switch_to(EditTasksSG.due_minute)
 
 
 async def save_due_edit(
@@ -145,7 +144,7 @@ async def save_due_edit(
     minute: str,
 ):
     manager.dialog_data["time"] = f"{manager.dialog_data['time']}:{minute}"
-    await manager.switch_to(ShowTasksSG.task_edit)
+    await manager.switch_to(EditTasksSG.task_edit)
 
 
 async def skip_hours(
@@ -170,7 +169,7 @@ async def edit_notice(
         "%d.%m.%Y %H:%M",
     ) - timedelta(minutes=int(notice))
     manager.dialog_data["notice"] = notice.strftime("%d.%m.%Y %H:%M")
-    await manager.switch_to(ShowTasksSG.task_edit)
+    await manager.switch_to(EditTasksSG.task_edit)
 
 
 async def delete_task(

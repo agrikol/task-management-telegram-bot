@@ -2,7 +2,7 @@ from datetime import datetime
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, Select
-from bot.states.states import CreateTaskSG, ShowTasksSG, TodayTasksSG
+from bot.states.states import CreateTaskSG, EditTasksSG, TodayTasksSG
 from bot.db.requests import get_tasks_names
 from bot.dialogs.create_task.getters import tags
 
@@ -38,7 +38,7 @@ async def start_get_tasks(
             name = f"{tags[tag] if tag != '0' else ''} {name}"
             names.append((name, str(task_id)))
 
-    await manager.start(ShowTasksSG.start, data={"task_names": names})
+    await manager.start(EditTasksSG.start, data={"task_names": names})
 
 
 # async def start_today_tasks(

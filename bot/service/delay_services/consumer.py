@@ -8,7 +8,9 @@ from aiogram.exceptions import TelegramBadRequest
 from nats.aio.client import Client
 from nats.aio.msg import Msg
 from nats.js import JetStreamContext
-from bot.kb.kb import notice_kb
+from sqlalchemy.ext.asyncio import AsyncSession
+from bot.utils.send_notice import send_notice
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +22,7 @@ class DelayedMessageConsumer:
         nc: Client,
         js: JetStreamContext,
         bot: Bot,
+        session: async_sessionmaker,
         subject: str,
         stream: str,
         durable_name: str,
@@ -30,6 +33,7 @@ class DelayedMessageConsumer:
         self.subject = subject
         self.stream = stream
         self.durable_name = durable_name
+        self.session = session
 
     async def start(self) -> None:
         self.stream_sub = await self.js.subscribe(
@@ -55,10 +59,8 @@ class DelayedMessageConsumer:
             chat_id = int(msg.headers.get("Tg-Delayed-Chat-ID"))
             task_id = msg.headers.get("Tg-Delayed-Task-ID")
             with suppress(TelegramBadRequest):
-                await self.bot.send_message(
-                    chat_id=chat_id,
-                    text=f"Отложенное сообщение {task_id}",
-                    reply_markup=notice_kb(),
+                await send_notice(
+                    bot=self.bot, session=self.session, chat_id=chat_id, task_id=task_id
                 )
             await msg.ack()
             logger.info("Message deleted.")

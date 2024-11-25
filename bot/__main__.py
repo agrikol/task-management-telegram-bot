@@ -19,9 +19,11 @@ from bot.dialogs.get_tasks.dialogs import task_list_dialog
 from bot.dialogs.feedback.dialogs import feedback_dialog
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
 from bot.middlewares.middlewares import AdminCheckerMiddleware
-from bot.utils.nats_connect import connect_nats
+from bot.utils.connect_nats import connect_nats
 from bot.utils.start_stream import create_stream
 from bot.utils.start_consumer import start_delayed_consumer
+from bot.utils.json_serializer import JsonSerializer
+import json
 
 
 logging.basicConfig(
@@ -46,6 +48,7 @@ async def main():
     storage = RedisStorage(
         redis=Redis.from_url(str(config.redis_dsn)),
         key_builder=DefaultKeyBuilder(with_destiny=True),
+        json_dumps=lambda obj: json.dumps(obj, default=JsonSerializer.default),
     )
 
     dp: Dispatcher = Dispatcher(storage=storage)
@@ -87,6 +90,7 @@ async def main():
                 nc=nc,
                 js=js,
                 bot=bot,
+                session=Sessionmaker,
                 subject=config.nats_delayed_consumer_subject,
                 stream=config.nats_delayed_consumer_stream,
                 durable_name=config.nats_delayed_consumer_durable_name,
