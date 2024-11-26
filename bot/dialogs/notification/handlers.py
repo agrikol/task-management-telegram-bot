@@ -4,12 +4,13 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Select
 from bot.states.states import NoticeEditSG
-from bot.dialogs.get_tasks.getters import tags
 from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
+from nats.js.client import JetStreamContext
+from bot.service.delay_services.publisher import publish_delay
 from bot.db.requests import (
     update_task,
     change_status_db,
@@ -44,6 +45,18 @@ async def edit_notice(
         _time=_time,
         notice=notice,
     )
+    if notice:
+        js: JetStreamContext = manager.middleware_data.get("js")
+        subject: str = manager.middleware_data.get("delay_del_subject")
+        await publish_delay(
+            session=session,
+            js=js,
+            subject=subject,
+            user_id=callback.from_user.id,
+            task_id=int(data.get("task_id")),
+            delay=notice,
+        )
+
     await callback.answer("☑️ Задача сохранена")
     await callback.message.delete()
     await manager.mark_closed()

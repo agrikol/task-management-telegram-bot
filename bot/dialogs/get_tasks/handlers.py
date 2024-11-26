@@ -8,7 +8,7 @@ from bot.states.states import EditTasksSG
 from aiogram.types import Message
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
-from datetime import date, datetime, timedelta, time
+from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.db.requests import (
     update_task,

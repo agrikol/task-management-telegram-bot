@@ -10,7 +10,7 @@ from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
-from bot.db.requests import add_task, get_user_timezone
+from bot.db.requests import add_task
 from bot.service.delay_services.publisher import publish_delay
 from nats.js.client import JetStreamContext
 
@@ -118,9 +118,6 @@ async def save_task(
 ):
     data: dict = manager.dialog_data
     session: AsyncSession = manager.middleware_data.get("session")
-    js: JetStreamContext = manager.middleware_data.get("js")
-    subject: str = manager.middleware_data.get("delay_del_subject")
-
     _date: date = datetime.strptime(data.get("date"), "%d.%m.%Y").date()
     _time = (
         datetime.strptime(data.get("time"), "%H:%M").time()
@@ -146,6 +143,8 @@ async def save_task(
     await callback.answer("☑️ Задача сохранена")
 
     if notice:
+        js: JetStreamContext = manager.middleware_data.get("js")
+        subject: str = manager.middleware_data.get("delay_del_subject")
         await publish_delay(
             js=js,
             session=session,
