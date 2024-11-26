@@ -119,7 +119,7 @@ async def process_location(message: Message, session: AsyncSession) -> None:
     )
 
 
-@commands_router.message(F.text == "Cancel")
+@commands_router.message(F.text == "Отмена")
 async def process_cancel(message: Message, dialog_manager: DialogManager) -> None:
     # TODO: Refactor this
     await message.delete()
