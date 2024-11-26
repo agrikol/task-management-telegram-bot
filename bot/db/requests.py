@@ -125,7 +125,7 @@ async def get_task_info(session: AsyncSession, task_id: int):
 
 
 async def get_task_short_info(session: AsyncSession, task_id: int):
-    stmt = select(Task.name, Task.desc).where(Task.task_id == task_id)
+    stmt = select(Task.name, Task.tag).where(Task.task_id == task_id)
     res = await session.execute(stmt)
     return res.first()
 

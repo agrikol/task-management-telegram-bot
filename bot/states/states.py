@@ -42,6 +42,21 @@ class EditTasksSG(StatesGroup):
     delete = State()
 
 
+class NoticeEditSG(StatesGroup):
+    start = State()
+    # task_edited = State()
+    name = State()
+    desc = State()
+    tag = State()
+    tag_list = State()
+    due = State()
+    due_hour = State()
+    due_minute = State()
+    notice = State()
+    save = State()
+    delete = State()
+
+
 class TodayTasksSG(StatesGroup):
     start = State()
 

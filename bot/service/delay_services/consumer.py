@@ -49,7 +49,6 @@ class DelayedMessageConsumer:
             float(msg.headers.get("Tg-Delayed-Msg-Timestamp")), tz=timezone.utc
         )
         delay: float = float(msg.headers.get("Tg-Delayed-Msg-Delay"))
-
         if sent_time + timedelta(seconds=delay) > datetime.now().astimezone():
             new_delay = (
                 sent_time + timedelta(seconds=delay) - datetime.now().astimezone()

@@ -17,6 +17,7 @@ from bot.dialogs.admin.dialogs import admin_dialog
 from bot.dialogs.create_task.dialogs import create_task_dialog
 from bot.dialogs.get_tasks.dialogs import task_list_dialog
 from bot.dialogs.feedback.dialogs import feedback_dialog
+from bot.dialogs.notification.dialog import notice_edit_dialog
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
 from bot.middlewares.middlewares import AdminCheckerMiddleware
 from bot.utils.connect_nats import connect_nats
@@ -67,6 +68,7 @@ async def main():
     logger.info(stream)
 
     setup_dialogs(dp)
+    # TODO: __init__.py
     dp.include_routers(
         commands_router,
         admin_router,
@@ -75,6 +77,7 @@ async def main():
         create_task_dialog,
         task_list_dialog,
         feedback_dialog,
+        notice_edit_dialog,
     )
     bot: Bot = Bot(
         token=config.bot_token.get_secret_value(),
