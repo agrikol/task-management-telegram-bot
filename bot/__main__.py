@@ -11,6 +11,7 @@ from redis.asyncio import Redis
 from bot.db.base import Base
 from bot.handlers.commands import commands_router
 from bot.handlers.admin_command import admin_router
+from bot.handlers.name_handler import name_router
 from bot.config.config_reader import Settings
 from bot.dialogs.start.dialogs import start_dialog
 from bot.dialogs.admin.dialogs import admin_dialog
@@ -72,6 +73,7 @@ async def main():
     dp.include_routers(
         commands_router,
         admin_router,
+        name_router,
         start_dialog,
         admin_dialog,
         create_task_dialog,

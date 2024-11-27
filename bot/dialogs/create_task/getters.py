@@ -15,6 +15,9 @@ async def get_template(
     dialog_manager: DialogManager,
     **kwargs,
 ) -> dict[str, str]:
+    if dialog_manager.start_data:
+        dialog_manager.dialog_data.update(dialog_manager.start_data)
+        dialog_manager.start_data.clear()
     dialog_data = dialog_manager.dialog_data
     name = f"{dialog_data.setdefault('name', 'Новая')}"
     desc = f"{dialog_data.setdefault('desc', 'Отсутствует')}"

@@ -8,7 +8,7 @@ from aiogram.types import (
 )
 from aiogram.filters import CommandStart, Command
 from aiogram_dialog import DialogManager, StartMode
-from bot.states.states import StartSG, FeedbackSG, NoticeEditSG
+from bot.states.states import StartSG, FeedbackSG, NoticeEditSG, CreateTaskSG
 from bot.db.requests import add_user, add_user_timezone, get_task_info, get_task_notice
 from sqlalchemy.ext.asyncio import AsyncSession
 from timezonefinder import TimezoneFinder
@@ -16,7 +16,10 @@ from bot.db.models import Task
 from bot.service.delay_services.publisher import publish_delay
 from datetime import datetime, timedelta
 from nats.js.client import JetStreamContext
-
+from aiogram.filters import Command, StateFilter
+from bot.states.states import CreateTaskSG
+from aiogram.fsm.context import FSMContext
+from bot.filters.dialog_filters import DialogFilter, DialogGroupFilter
 
 commands_router: Router = Router()
 
@@ -73,11 +76,13 @@ async def process_tomorrow_notice(
     )
 
     await callback.message.delete()
+    await dialog_manager.mark_closed()
     await callback.answer("Перенесено на завтра")
 
 
 @commands_router.message(F.data.startswith("notice:delete:"))
 async def process_delete_notice(callback: CallbackQuery, dialog_manager: DialogManager):
+    await dialog_manager.mark_closed()
     await callback.message.delete()
 
 

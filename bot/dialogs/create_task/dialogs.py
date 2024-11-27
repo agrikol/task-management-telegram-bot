@@ -3,8 +3,8 @@ from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import (
+    Start,
     Row,
-    Cancel,
     SwitchTo,
     Calendar,
     Select,
@@ -12,7 +12,7 @@ from aiogram_dialog.widgets.kbd import (
     Button,
     Back,
 )
-from bot.states.states import CreateTaskSG
+from bot.states.states import CreateTaskSG, StartSG
 from bot.dialogs.create_task.getters import (
     get_template,
     get_hours,
@@ -56,7 +56,7 @@ create_task_dialog = Dialog(
             id="save",
             on_click=save_task,
         ),
-        Cancel(Const("« Назад"), id="calcel"),
+        Start(Const("🔙 Назад"), id="to_start", state=StartSG.start),
         state=CreateTaskSG.start,
         getter=get_template,
     ),
