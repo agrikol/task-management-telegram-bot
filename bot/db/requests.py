@@ -87,8 +87,8 @@ async def update_task(
     task_id: int,
     name: str,
     desc: str,
-    _date: str,
-    _time: str,
+    _date: date,
+    _time: time,
     tag: str,
     notice: datetime | None = None,
     status: int = 1,
@@ -112,6 +112,17 @@ async def update_task(
     await session.commit()
 
 
+async def update_date_and_notice(
+    session: AsyncSession,
+    task_id: int,
+    _date: date,
+    notice: datetime | None = None,
+):
+    stmt = update(Task).where(Task.task_id == task_id).values(date=_date, notice=notice)
+    await session.execute(stmt)
+    await session.commit()
+
+
 async def change_status_db(session: AsyncSession, task_id: int, status: int = 0):
     stmt = update(Task).where(Task.task_id == task_id).values(status=status)
     await session.execute(stmt)
@@ -124,10 +135,10 @@ async def get_task_info(session: AsyncSession, task_id: int):
     return res.scalar()
 
 
-async def get_task_notice(session: AsyncSession, task_id: int):
-    stmt = select(Task.notice).where(Task.task_id == task_id)
+async def get_task_date_and_notice(session: AsyncSession, task_id: int):
+    stmt = select(Task.date, Task.notice).where(Task.task_id == task_id)
     res = await session.execute(stmt)
-    return res.scalar()
+    return res.first()
 
 
 async def get_task_short_info(session: AsyncSession, task_id: int):

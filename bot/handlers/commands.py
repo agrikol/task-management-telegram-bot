@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from operator import itemgetter
 from aiogram.types import (
     Message,
     CallbackQuery,
@@ -8,18 +9,22 @@ from aiogram.types import (
 )
 from aiogram.filters import CommandStart, Command
 from aiogram_dialog import DialogManager, StartMode
-from bot.states.states import StartSG, FeedbackSG, NoticeEditSG, CreateTaskSG
-from bot.db.requests import add_user, add_user_timezone, get_task_info, get_task_notice
+from bot.states.states import StartSG, FeedbackSG, NoticeEditSG
+from bot.db.requests import (
+    add_user,
+    add_user_timezone,
+    get_task_info,
+    get_task_date_and_notice,
+    update_date_and_notice,
+    change_status_db,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from timezonefinder import TimezoneFinder
 from bot.db.models import Task
 from bot.service.delay_services.publisher import publish_delay
-from datetime import datetime, timedelta
-from nats.js.client import JetStreamContext
-from aiogram.filters import Command, StateFilter
-from bot.states.states import CreateTaskSG
-from aiogram.fsm.context import FSMContext
-from bot.filters.dialog_filters import DialogFilter, DialogGroupFilter
+from datetime import datetime, timedelta, date
+from aiogram.filters import Command
+
 
 commands_router: Router = Router()
 
@@ -54,30 +59,48 @@ async def process_edit_notice(callback: CallbackQuery, dialog_manager: DialogMan
     )
 
 
-@commands_router.message(F.data.startswith("notice:tomorrow:"))
+@commands_router.callback_query(F.data.startswith("notice:tomorrow:"))
 async def process_tomorrow_notice(
     callback: CallbackQuery, dialog_manager: DialogManager
 ):
-    session: AsyncSession = dialog_manager.middleware_data.get("session")
-    js: JetStreamContext = dialog_manager.middleware_data.get("js")
-    subject: str = dialog_manager.middleware_data.get("delay_del_subject")
+    session, js, subject = itemgetter(*("session", "js", "subject"))(
+        dialog_manager.middleware_data
+    )
 
-    task_id = int(callback.data.split(":")[-1])
-    notice_time = await get_task_notice(session, task_id)
-    user_id = callback.from_user.id
-    delay: datetime = notice_time + timedelta(days=1)
+    task_id: int = int(callback.data.split(":")[-1])
+    user_id: str = callback.from_user.id
+    task_date, notice_time = await get_task_date_and_notice(session, task_id)
+    new_task_date: date = task_date + timedelta(days=1)
+    new_notice: datetime = notice_time + timedelta(days=1)
+
+    await update_date_and_notice(
+        session=session,
+        task_id=task_id,
+        _date=new_task_date,
+        notice=new_notice,
+    )
+
     await publish_delay(
         js=js,
         session=session,
         user_id=user_id,
         task_id=task_id,
         subject=subject,
-        delay=delay,
+        delay=new_notice,
     )
 
     await callback.message.delete()
     await dialog_manager.mark_closed()
     await callback.answer("Перенесено на завтра")
+
+
+@commands_router.callback_query(F.data.startswith("notice:done:"))
+async def process_done_notice(callback: CallbackQuery, dialog_manager: DialogManager):
+    session: AsyncSession = dialog_manager.middleware_data.get("session")
+    await change_status_db(session, int(callback.data.split(":")[-1]), status=2)
+    await callback.answer("✅ Задача выполнена")
+    await dialog_manager.mark_closed()
+    await callback.message.delete()
 
 
 @commands_router.message(F.data.startswith("notice:delete:"))

@@ -1,5 +1,5 @@
-import pytz
 from aiogram import Bot
+from operator import itemgetter
 from datetime import datetime, date
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
@@ -143,8 +143,7 @@ async def save_task(
     await callback.answer("☑️ Задача сохранена")
 
     if notice:
-        js: JetStreamContext = manager.middleware_data.get("js")
-        subject: str = manager.middleware_data.get("delay_del_subject")
+        js, subject = itemgetter("js", "subject")(manager.middleware_data)
         await publish_delay(
             js=js,
             session=session,

@@ -11,4 +11,6 @@ name_router: Router = Router()
 async def process_create_task_with_name(
     message: Message, dialog_manager: DialogManager
 ):
-    await dialog_manager.start(CreateTaskSG.start, data={"name": message.text})
+    name, *desc = message.text.split("\n", 1)
+    data = {"name": name, "desc": desc[0]} if desc else {"name": name}
+    await dialog_manager.start(CreateTaskSG.start, data=data)

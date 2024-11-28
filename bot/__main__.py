@@ -44,7 +44,7 @@ async def main():
         await conn.execute(text("SELECT 1"))
 
     async with engine.begin() as connection:
-        # await connection.run_sync(Base.metadata.drop_all)  # TODO: remove
+        await connection.run_sync(Base.metadata.drop_all)  # TODO: remove
         await connection.run_sync(Base.metadata.create_all)
 
     storage = RedisStorage(
@@ -88,9 +88,7 @@ async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     try:
         await asyncio.gather(
-            dp.start_polling(
-                bot, js=js, delay_del_subject=config.nats_delayed_consumer_subject
-            ),
+            dp.start_polling(bot, js=js, subject=config.nats_delayed_consumer_subject),
             start_delayed_consumer(
                 nc=nc,
                 js=js,

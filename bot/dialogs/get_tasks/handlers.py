@@ -187,7 +187,4 @@ async def complete_task(
     session: AsyncSession = manager.middleware_data.get("session")
     await callback.answer("✅ Задача выполнена")
     await change_status_db(session, int(manager.dialog_data.get("task_id")), status=2)
-    # names = await get_tasks_names(session, callback.from_user.id)
-    # manager.dialog_data["task_names"] = [(i, str(j)) for i, j in names]
-    # await manager.switch_to(ShowTasksSG.start)
     await manager.done()

@@ -47,7 +47,7 @@ async def edit_notice(
     )
     if notice:
         js: JetStreamContext = manager.middleware_data.get("js")
-        subject: str = manager.middleware_data.get("delay_del_subject")
+        subject: str = manager.middleware_data.get("subject")
         await publish_delay(
             session=session,
             js=js,
