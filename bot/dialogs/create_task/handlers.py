@@ -12,7 +12,7 @@ from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.db.requests import add_task
 from bot.service.delay_services.publisher import publish_delay
-from nats.js.client import JetStreamContext
+from aiogram_dialog.api.entities import ShowMode
 
 
 async def add_name_handler(
@@ -20,13 +20,8 @@ async def add_name_handler(
 ) -> None:
     bot: Bot = manager.middleware_data["bot"]
     manager.dialog_data.update(name=text)
-    try:
-        await bot.delete_messages(
-            message.chat.id, [message.message_id - 1, message.message_id]
-        )
-    except Exception as e:
-        pass  # TODO add logger
-    await manager.switch_to(CreateTaskSG.start)
+    await message.delete()
+    await manager.switch_to(CreateTaskSG.start, show_mode=ShowMode.EDIT)
 
 
 async def add_desc_handler(
@@ -34,13 +29,8 @@ async def add_desc_handler(
 ) -> None:
     manager.dialog_data.update(desc=text)
     bot: Bot = manager.middleware_data["bot"]
-    try:
-        await bot.delete_messages(
-            message.chat.id, [message.message_id - 1, message.message_id]
-        )
-    except Exception as e:
-        pass  # TODO add logger
-    await manager.switch_to(CreateTaskSG.start)
+    await message.delete()
+    await manager.switch_to(CreateTaskSG.start, show_mode=ShowMode.EDIT)
 
 
 async def add_tag(

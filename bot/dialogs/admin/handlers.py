@@ -20,9 +20,6 @@ async def send_admin_message(
 ) -> None:
     bot: Bot = manager.middleware_data["bot"]
     session: AsyncSession = manager.middleware_data["session"]
-    await bot.delete_messages(
-        message.chat.id, [message.message_id - 1, message.message_id]
-    )
     user_ids: list[int] = [user[0] for user in await get_userlist_db(session=session)]
     await asyncio.gather(*(bot.send_message(user_id, text) for user_id in user_ids))
     await manager.switch_to(AdminSG.start)

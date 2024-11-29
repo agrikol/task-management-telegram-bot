@@ -1,3 +1,4 @@
+import json
 import asyncio, logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
@@ -9,23 +10,17 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from redis.asyncio import Redis
 from bot.db.base import Base
+from bot.config.config_reader import Settings
 from bot.handlers.commands import commands_router
 from bot.handlers.admin_command import admin_router
 from bot.handlers.name_handler import name_router
-from bot.config.config_reader import Settings
-from bot.dialogs.start.dialogs import start_dialog
-from bot.dialogs.admin.dialogs import admin_dialog
-from bot.dialogs.create_task.dialogs import create_task_dialog
-from bot.dialogs.get_tasks.dialogs import task_list_dialog
-from bot.dialogs.feedback.dialogs import feedback_dialog
-from bot.dialogs.notification.dialog import notice_edit_dialog
+from bot.dialogs import dialogs
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
 from bot.middlewares.middlewares import AdminCheckerMiddleware
 from bot.utils.connect_nats import connect_nats
 from bot.utils.start_stream import create_stream
 from bot.utils.start_consumer import start_delayed_consumer
 from bot.utils.json_serializer import JsonSerializer
-import json
 
 
 logging.basicConfig(
@@ -69,18 +64,7 @@ async def main():
     logger.info(stream)
 
     setup_dialogs(dp)
-    # TODO: __init__.py
-    dp.include_routers(
-        commands_router,
-        admin_router,
-        name_router,
-        start_dialog,
-        admin_dialog,
-        create_task_dialog,
-        task_list_dialog,
-        feedback_dialog,
-        notice_edit_dialog,
-    )
+    dp.include_routers(commands_router, admin_router, name_router, *dialogs)
     bot: Bot = Bot(
         token=config.bot_token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
