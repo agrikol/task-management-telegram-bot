@@ -24,6 +24,7 @@ from bot.db.models import Task
 from bot.service.delay_services.publisher import publish_delay
 from datetime import datetime, timedelta, date
 from aiogram.filters import Command
+from aiogram_dialog.api.entities import ShowMode
 
 
 commands_router: Router = Router()
@@ -56,6 +57,7 @@ async def process_edit_notice(callback: CallbackQuery, dialog_manager: DialogMan
         NoticeEditSG.start,
         data={**task, "task_id": task_id},
         mode=StartMode.NORMAL,
+        show_mode=ShowMode.EDIT,
     )
 
 
@@ -89,9 +91,9 @@ async def process_tomorrow_notice(
         delay=new_notice,
     )
 
-    await callback.message.delete()
-    await dialog_manager.mark_closed()
     await callback.answer("Перенесено на завтра")
+    await callback.message.delete()
+    # await dialog_manager.mark_closed()
 
 
 @commands_router.callback_query(F.data.startswith("notice:done:"))
@@ -99,13 +101,13 @@ async def process_done_notice(callback: CallbackQuery, dialog_manager: DialogMan
     session: AsyncSession = dialog_manager.middleware_data.get("session")
     await change_status_db(session, int(callback.data.split(":")[-1]), status=2)
     await callback.answer("✅ Задача выполнена")
-    await dialog_manager.mark_closed()
+    # await dialog_manager.mark_closed()
     await callback.message.delete()
 
 
 @commands_router.message(F.data.startswith("notice:delete:"))
-async def process_delete_notice(callback: CallbackQuery, dialog_manager: DialogManager):
-    await dialog_manager.mark_closed()
+async def process_delete_notice(callback: CallbackQuery):
+    # await dialog_manager.mark_closed()
     await callback.message.delete()
 
 
