@@ -11,6 +11,7 @@ from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram_dialog.api.entities import ShowMode
+from bot.service.delay_services.publisher import publish_delay
 from bot.db.requests import (
     update_task,
     get_task_info,
@@ -69,6 +70,16 @@ async def edit_task(
         notice=notice,
     )
     await callback.answer("☑️ Задача сохранена")
+    if notice:
+        js, subject = itemgetter("js", "subject")(manager.middleware_data)
+        await publish_delay(
+            session=session,
+            js=js,
+            subject=subject,
+            user_id=callback.from_user.id,
+            task_id=int(data.get("task_id")),
+            delay=notice,
+        )
     await manager.done()
 
 

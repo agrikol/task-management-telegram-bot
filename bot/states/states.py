@@ -3,7 +3,6 @@ from aiogram.fsm.state import State, StatesGroup
 
 class StartSG(StatesGroup):
     start = State()
-    # admin = State()
 
 
 class AdminSG(StatesGroup):
@@ -61,8 +60,8 @@ class TodayTasksSG(StatesGroup):
     start = State()
 
 
-class HelpSG(StatesGroup):
-    start = State()
+class TipsSG(StatesGroup):
+    START = State()
 
 
 class FeedbackSG(StatesGroup):
@@ -71,5 +70,5 @@ class FeedbackSG(StatesGroup):
     bug_report = State()
 
 
-# class NoticeSG(StatesGroup):
-#     start = State()
+class LocationSG(StatesGroup):
+    MAIN = State()

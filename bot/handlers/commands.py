@@ -3,13 +3,10 @@ from operator import itemgetter
 from aiogram.types import (
     Message,
     CallbackQuery,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardRemove,
 )
 from aiogram.filters import CommandStart, Command
 from aiogram_dialog import DialogManager, StartMode
-from bot.states.states import StartSG, FeedbackSG, NoticeEditSG
+from bot.states.states import StartSG, FeedbackSG, NoticeEditSG, LocationSG, TipsSG
 from bot.db.requests import (
     add_user,
     add_user_timezone,
@@ -43,7 +40,17 @@ async def process_start_command(
         message.from_user.username,
         message.from_user.last_name,
     )
-    await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)
+    await dialog_manager.start(
+        StartSG.start, mode=StartMode.RESET_STACK, show_mode=ShowMode.DELETE_AND_SEND
+    )
+
+
+@commands_router.message(Command("tips"))
+async def process_tip_command(message: Message, dialog_manager: DialogManager):
+    await message.delete()
+    await dialog_manager.start(
+        TipsSG.START, mode=StartMode.NORMAL, show_mode=ShowMode.EDIT
+    )
 
 
 @commands_router.callback_query(F.data.startswith("notice:edit:"))
@@ -93,7 +100,6 @@ async def process_tomorrow_notice(
 
     await callback.answer("Перенесено на завтра")
     await callback.message.delete()
-    # await dialog_manager.mark_closed()
 
 
 @commands_router.callback_query(F.data.startswith("notice:done:"))
@@ -101,13 +107,11 @@ async def process_done_notice(callback: CallbackQuery, dialog_manager: DialogMan
     session: AsyncSession = dialog_manager.middleware_data.get("session")
     await change_status_db(session, int(callback.data.split(":")[-1]), status=2)
     await callback.answer("✅ Задача выполнена")
-    # await dialog_manager.mark_closed()
     await callback.message.delete()
 
 
-@commands_router.message(F.data.startswith("notice:delete:"))
+@commands_router.callback_query(F.data.startswith("notice:delete:"))
 async def process_delete_notice(callback: CallbackQuery):
-    # await dialog_manager.mark_closed()
     await callback.message.delete()
 
 
@@ -121,40 +125,29 @@ async def process_feedback_command(
 
 
 @commands_router.message(Command("timezone"))
-async def process_location_command(message: Message) -> None:
-    location_btn = KeyboardButton(text="📍 Указать часовой пояс", request_location=True)
-    cancel_btn = KeyboardButton(text="❌ Отмена")
-    keyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(
-        keyboard=[[location_btn], [cancel_btn]], resize_keyboard=True
-    )
-    await message.answer(
-        "Нажмите на кнопку 📍. Бот не хранит ваше местоположение и "
-        "использует его один раз только для определения часового пояса",
-        reply_markup=keyboard,
+async def process_location_command(
+    message: Message, dialog_manager: DialogManager
+) -> None:
+    await message.delete()
+    await dialog_manager.start(
+        LocationSG.MAIN, mode=StartMode.NORMAL, show_mode=ShowMode.EDIT
     )
 
 
 @commands_router.message(F.location)
-async def process_location(message: Message, session: AsyncSession) -> None:
-    # TODO: Refactor this
+async def process_location(
+    message: Message, session: AsyncSession, dialog_manager: DialogManager
+) -> None:
     await message.delete()
     tf = TimezoneFinder()
     timezone = tf.timezone_at(
         lng=message.location.longitude, lat=message.location.latitude
     )
     await add_user_timezone(session, message.from_user.id, timezone)
-    await message.answer(
-        f"📍 Ваш часовой пояс: {timezone}",
-        reply_markup=ReplyKeyboardRemove(),
-    )
+    await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)
 
 
-@commands_router.message(F.text == "Отмена")
+@commands_router.message(F.text == "🚫")
 async def process_cancel(message: Message, dialog_manager: DialogManager) -> None:
-    # TODO: Refactor this
     await message.delete()
-    await message.answer(
-        "📍 Вы сможете установить /timezone в следующий раз",
-        reply_markup=ReplyKeyboardRemove(),
-    )
     await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)

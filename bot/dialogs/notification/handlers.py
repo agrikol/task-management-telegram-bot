@@ -9,7 +9,6 @@ from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
-from nats.js.client import JetStreamContext
 from bot.service.delay_services.publisher import publish_delay
 from bot.db.requests import (
     update_task,
@@ -46,8 +45,7 @@ async def edit_notice(
         notice=notice,
     )
     if notice:
-        js: JetStreamContext = manager.middleware_data.get("js")
-        subject: str = manager.middleware_data.get("subject")
+        js, subject = itemgetter("js", "subject")(manager.middleware_data)
         await publish_delay(
             session=session,
             js=js,

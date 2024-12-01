@@ -14,7 +14,7 @@ async def send_notice(
         )
     task_tag: str = tags.get(task_tag) if task_tag != "0" else ""
 
-    text: str = f"🔔 Уведомление\n\n{task_tag} <b>Задача: {task_name}</b>"
+    text: str = f"🔔{task_tag} <b>{task_name}</b>"
     await bot.send_message(
         chat_id=chat_id,
         text=text,

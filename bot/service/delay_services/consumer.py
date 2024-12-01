@@ -62,7 +62,7 @@ class DelayedMessageConsumer:
                     bot=self.bot, session=self.session, chat_id=chat_id, task_id=task_id
                 )
             await msg.ack()
-            logger.info("Message deleted.")
+            logger.info("Message delivered.")
 
     async def unsubscribe(self) -> None:
         if self.stream_sub:

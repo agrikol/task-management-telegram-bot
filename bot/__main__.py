@@ -2,10 +2,10 @@ import json
 import asyncio, logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
+from aiogram.filters import ExceptionTypeFilter
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.storage.base import DefaultKeyBuilder
 from aiogram.client.default import DefaultBotProperties
-from aiogram_dialog import setup_dialogs
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from redis.asyncio import Redis
@@ -13,14 +13,17 @@ from bot.db.base import Base
 from bot.config.config_reader import Settings
 from bot.handlers.commands import commands_router
 from bot.handlers.admin_command import admin_router
-from bot.handlers.name_handler import name_router
+from bot.handlers.name_handler import task_name_router
 from bot.dialogs import dialogs
 from bot.middlewares.session import CacheMiddleware, DbSessionMiddleware
-from bot.middlewares.middlewares import AdminCheckerMiddleware
+from bot.middlewares.admin_checker import AdminCheckerMiddleware
 from bot.utils.connect_nats import connect_nats
 from bot.utils.start_stream import create_stream
 from bot.utils.start_consumer import start_delayed_consumer
 from bot.utils.json_serializer import JsonSerializer
+from bot.errors.callbacks import on_outdated_intent
+from aiogram_dialog import setup_dialogs
+from aiogram_dialog.api.exceptions import OutdatedIntent
 
 
 logging.basicConfig(
@@ -64,7 +67,8 @@ async def main():
     logger.info(stream)
 
     setup_dialogs(dp)
-    dp.include_routers(commands_router, admin_router, name_router, *dialogs)
+    dp.include_routers(commands_router, admin_router, task_name_router, *dialogs)
+    dp.errors.register(on_outdated_intent, ExceptionTypeFilter(OutdatedIntent))
     bot: Bot = Bot(
         token=config.bot_token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),

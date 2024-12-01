@@ -12,3 +12,4 @@ bot/db/temp_users.db
 .DS_Store
 nui
 nats/data
+redis/data/
