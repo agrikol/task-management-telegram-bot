@@ -1,14 +1,12 @@
 import logging
 from contextlib import suppress
 from datetime import datetime, timedelta, timezone
-
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
-
+from bot.db.requests import get_task_status
 from nats.aio.client import Client
 from nats.aio.msg import Msg
 from nats.js import JetStreamContext
-from sqlalchemy.ext.asyncio import AsyncSession
 from bot.utils.send_notice import send_notice
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -55,6 +53,16 @@ class DelayedMessageConsumer:
             ).total_seconds()
             await msg.nak(delay=new_delay)
         else:
+            # await self.js.delete_msg(
+            #     stream_name=self.stream, seq=msg.metadata.sequence.stream
+            # ) # TODO: probably msg should be deleted from stream when task status changed
+            async with self.session() as session:
+                status: int = await get_task_status(
+                    session=session, task_id=int(msg.headers.get("Tg-Delayed-Task-ID"))
+                )
+            if status in (0, 2):
+                await msg.ack()
+                return
             chat_id = int(msg.headers.get("Tg-Delayed-Chat-ID"))
             task_id = msg.headers.get("Tg-Delayed-Task-ID")
             with suppress(TelegramBadRequest):

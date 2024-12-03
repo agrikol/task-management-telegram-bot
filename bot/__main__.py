@@ -42,7 +42,7 @@ async def main():
         await conn.execute(text("SELECT 1"))
 
     async with engine.begin() as connection:
-        await connection.run_sync(Base.metadata.drop_all)  # TODO: remove
+        # await connection.run_sync(Base.metadata.drop_all)  # TODO: remove
         await connection.run_sync(Base.metadata.create_all)
 
     storage = RedisStorage(
