@@ -32,7 +32,7 @@ from bot.dialogs.notification.getters import (
     getter_of_tag,
 )
 from bot.dialogs.notification.handlers import edit_notice
-
+from aiogram_dialog.api.entities.launch_mode import LaunchMode
 
 notice_edit_dialog = Dialog(
     Window(

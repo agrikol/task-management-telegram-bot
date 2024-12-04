@@ -21,9 +21,9 @@ from bot.utils.connect_nats import connect_nats
 from bot.utils.start_stream import create_stream
 from bot.utils.start_consumer import start_delayed_consumer
 from bot.utils.json_serializer import JsonSerializer
-from bot.errors.callbacks import on_outdated_intent
+from bot.errors.callbacks import on_outdated_intent, on_unknown_intent
 from aiogram_dialog import setup_dialogs
-from aiogram_dialog.api.exceptions import OutdatedIntent
+from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent
 
 
 logging.basicConfig(
@@ -69,6 +69,7 @@ async def main():
     setup_dialogs(dp)
     dp.include_routers(commands_router, admin_router, task_name_router, *dialogs)
     dp.errors.register(on_outdated_intent, ExceptionTypeFilter(OutdatedIntent))
+    dp.errors.register(on_unknown_intent, ExceptionTypeFilter(UnknownIntent))
     bot: Bot = Bot(
         token=config.bot_token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),

@@ -10,6 +10,7 @@ from aiogram_dialog.widgets.kbd import Calendar
 from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from bot.service.delay_services.publisher import publish_delay
+from aiogram_dialog.api.entities import ShowMode
 from bot.db.requests import (
     update_task,
     change_status_db,
@@ -65,7 +66,8 @@ async def edit_name_handler(
 ) -> None:
     manager.dialog_data.update(name=text)
     bot: Bot = manager.middleware_data["bot"]
-    await manager.switch_to(NoticeEditSG.start)
+    await message.delete()
+    await manager.switch_to(NoticeEditSG.start, show_mode=ShowMode.EDIT)
 
 
 async def edit_desc_handler(
@@ -73,7 +75,8 @@ async def edit_desc_handler(
 ) -> None:
     manager.dialog_data.update(desc=text)
     bot: Bot = manager.middleware_data["bot"]
-    await manager.switch_to(NoticeEditSG.start)
+    await message.delete()
+    await manager.switch_to(NoticeEditSG.start, show_mode=ShowMode.EDIT)
 
 
 async def edit_tag(

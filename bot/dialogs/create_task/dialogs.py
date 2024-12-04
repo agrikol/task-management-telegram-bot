@@ -11,6 +11,7 @@ from aiogram_dialog.widgets.kbd import (
     Group,
     Button,
     Back,
+    Cancel,
 )
 from bot.states.states import CreateTaskSG, StartSG
 from bot.dialogs.create_task.getters import (
@@ -56,7 +57,7 @@ create_task_dialog = Dialog(
             id="save",
             on_click=save_task,
         ),
-        Start(Const("🔙 Назад"), id="to_start", state=StartSG.start),
+        Cancel(Const("🔙 Назад"), id="to_start"),
         state=CreateTaskSG.start,
         getter=get_template,
     ),
