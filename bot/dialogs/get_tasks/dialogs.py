@@ -54,7 +54,7 @@ task_list_dialog = Dialog(
             height=5,
             id="task_list",
         ),
-        Cancel(Const("« Назад"), id="cancel"),
+        Cancel(Const("☰ Меню"), id="cancel"),
         state=EditTasksSG.start,
         getter=getter_of_names,
     ),

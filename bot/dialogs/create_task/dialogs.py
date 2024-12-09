@@ -57,7 +57,7 @@ create_task_dialog = Dialog(
             id="save",
             on_click=save_task,
         ),
-        Cancel(Const("🔙 Назад"), id="to_start"),
+        Cancel(Const("☰ Меню"), id="to_start"),
         state=CreateTaskSG.start,
         getter=get_template,
     ),

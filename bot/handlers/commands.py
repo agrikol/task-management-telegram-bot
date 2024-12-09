@@ -49,7 +49,7 @@ async def process_start_command(
 async def process_tip_command(message: Message, dialog_manager: DialogManager):
     await message.delete()
     await dialog_manager.start(
-        TipsSG.START, mode=StartMode.NORMAL, show_mode=ShowMode.EDIT
+        TipsSG.FIRST, mode=StartMode.NORMAL, show_mode=ShowMode.EDIT
     )
 
 
@@ -144,10 +144,4 @@ async def process_location(
         lng=message.location.longitude, lat=message.location.latitude
     )
     await add_user_timezone(session, message.from_user.id, timezone)
-    await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)
-
-
-@commands_router.message(F.text == "🚫")
-async def process_cancel(message: Message, dialog_manager: DialogManager) -> None:
-    await message.delete()
-    await dialog_manager.start(StartSG.start, mode=StartMode.RESET_STACK)
+    await dialog_manager.start(TipsSG.SECOND)

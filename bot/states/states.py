@@ -61,7 +61,10 @@ class TodayTasksSG(StatesGroup):
 
 
 class TipsSG(StatesGroup):
-    START = State()
+    FIRST = State()
+    SECOND = State()
+    THIRD = State()
+    FOURTH = State()
 
 
 class FeedbackSG(StatesGroup):
