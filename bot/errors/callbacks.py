@@ -23,15 +23,3 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
                 await event.update.callback_query.message.delete()
             except TelegramBadRequest as e:
                 logging.exception("Failed to delete message %s", e)
-
-    # elif event.update.message:
-    #     await event.update.message.answer(
-    #         "Bot process was restarted due to maintenance.\n"
-    #         "Redirecting to main menu.",
-    #         reply_markup=ReplyKeyboardRemove(),
-    #     )
-    # await dialog_manager.start(
-    #     states.Main.MAIN,
-    #     mode=StartMode.RESET_STACK,
-    #     show_mode=ShowMode.SEND,
-    # )

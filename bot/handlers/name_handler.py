@@ -2,7 +2,13 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters import or_f
 from aiogram_dialog import DialogManager
-from bot.states.states import CreateTaskSG, EditTasksSG, NoticeEditSG
+from bot.states.states import (
+    CreateTaskSG,
+    EditTasksSG,
+    NoticeEditSG,
+    FeedbackSG,
+    AdminSG,
+)
 from bot.filters.dialog_filters import DialogGroupFilter
 from aiogram_dialog.api.entities import ShowMode
 
@@ -16,6 +22,8 @@ task_name_router: Router = Router()
         DialogGroupFilter(CreateTaskSG),
         DialogGroupFilter(EditTasksSG),
         DialogGroupFilter(NoticeEditSG),
+        DialogGroupFilter(FeedbackSG),
+        DialogGroupFilter(AdminSG),
     ),
 )
 async def process_create_task_with_name(

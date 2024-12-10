@@ -23,7 +23,6 @@ from datetime import datetime, timedelta, date
 from aiogram.filters import Command
 from aiogram_dialog.api.entities import ShowMode
 
-
 commands_router: Router = Router()
 
 
@@ -121,7 +120,9 @@ async def process_feedback_command(
     dialog_manager: DialogManager,
 ) -> None:
     await message.delete()
-    await dialog_manager.start(FeedbackSG.start, mode=StartMode.NORMAL)
+    await dialog_manager.start(
+        FeedbackSG.start, mode=StartMode.NORMAL, show_mode=ShowMode.EDIT
+    )
 
 
 @commands_router.message(Command("timezone"))

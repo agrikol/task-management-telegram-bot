@@ -1,10 +1,10 @@
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Const, List, Format
-from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, NumberedPager
+from aiogram_dialog.widgets.kbd import SwitchTo, Back, NumberedPager, Start
 from aiogram_dialog.widgets.input import TextInput
-from bot.states.states import AdminSG
+from bot.states.states import AdminSG, StartSG
 from bot.dialogs.admin.getters import getter_of_userlist, getter_of_task_count
-from bot.dialogs.admin.handlers import exit_admin, send_admin_message
+from bot.dialogs.admin.handlers import send_admin_message
 
 
 admin_dialog = Dialog(
@@ -13,7 +13,7 @@ admin_dialog = Dialog(
         SwitchTo(Const("⚙ User List"), id="userlist", state=AdminSG.userlist),
         SwitchTo(Const("⚙ Task Count"), id="tasks_count", state=AdminSG.task_count),
         SwitchTo(Const("⚙ Message"), id="message", state=AdminSG.message),
-        Button(Const("❌ Exit"), id="exit", on_click=exit_admin),
+        Start(Const("❌ Exit"), id="exit", state=StartSG.start),
         state=AdminSG.start,
     ),
     Window(

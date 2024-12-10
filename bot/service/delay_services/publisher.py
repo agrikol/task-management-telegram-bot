@@ -14,7 +14,7 @@ async def publish_delay(
     task_id: int,
 ):
     utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
-    tz: str = await get_user_timezone(session, user_id)
+    tz: str = await get_user_timezone(session, user_id) or "Europe/Moscow"
     tz_offset = pytz.timezone(tz).utcoffset(utcnow)
     delay: float = (delay - (utcnow + tz_offset)).total_seconds()
     headers = {
