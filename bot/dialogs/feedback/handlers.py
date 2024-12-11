@@ -33,8 +33,9 @@ async def accept_feedback(  # TODO: save to some storage
     bot: Bot = manager.middleware_data["bot"]
     admin_ids: list = manager.middleware_data["admin_ids"]
     feedack_type: str = manager.dialog_data.get("feedback_type")
-    text: str = f"Новый {feedack_type}\nот {message.from_user.username} "
-    f"{message.from_user.id}:\n{text}"
+    text: str = (
+        f"{feedack_type}\n{message.from_user.username}\n{message.from_user.id}:\n{text}"
+    )
     try:
         await message.delete()
         await asyncio.gather(  # TODO: NATS

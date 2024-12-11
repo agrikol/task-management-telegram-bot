@@ -7,9 +7,9 @@ from aiogram_dialog.widgets.kbd import (
     Next,
 )
 from bot.states.states import TipsSG, LocationSG, StartSG
-from aiogram_dialog.widgets.media import DynamicMedia, StaticMedia
-from aiogram_dialog.api.entities import MediaAttachment
+from aiogram_dialog.widgets.media import StaticMedia
 from aiogram.enums import ContentType
+from bot.enum.enums import MediaPath
 
 
 tips_dialog = Dialog(
@@ -30,7 +30,7 @@ tips_dialog = Dialog(
         Const("💡 <b>Tip #2</b>"),
         Const("Просмотрите короткий GIF-ролик о способах создать задачу"),
         StaticMedia(
-            path=r"bot/media/1.gif",
+            path=MediaPath.TIP2,
             type=ContentType.ANIMATION,
         ),
         Row(
@@ -44,7 +44,7 @@ tips_dialog = Dialog(
         Const("💡 <b>Tip #3</b>"),
         Const("Посмотрите короткий GIF-ролик о том, как работают Напоминания"),
         StaticMedia(
-            path=r"bot/media/2.gif",
+            path=MediaPath.TIP3,
             type=ContentType.ANIMATION,
         ),
         Row(
@@ -62,7 +62,7 @@ tips_dialog = Dialog(
             "Если ошибка сохраняется - обязательно воспользуйтесь командой /feedback"
         ),
         StaticMedia(
-            path=r"bot/media/3.gif",
+            path=MediaPath.TIP4,
             type=ContentType.ANIMATION,
         ),
         Row(
