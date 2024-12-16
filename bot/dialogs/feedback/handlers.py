@@ -23,7 +23,6 @@ async def move_to_feedback(
     callback: CallbackQuery, widget: TextInput, manager: DialogManager
 ):
     manager.dialog_data.update(feedback_type=callback.data)
-    await callback.message.delete()
     await manager.switch_to(FeedbackSG.feedback, show_mode=ShowMode.EDIT)
 
 
@@ -36,8 +35,8 @@ async def accept_feedback(  # TODO: save to some storage
     text: str = (
         f"{feedack_type}\n{message.from_user.username}\n{message.from_user.id}:\n{text}"
     )
+    await message.delete()
     try:
-        await message.delete()
         await asyncio.gather(  # TODO: NATS
             *(
                 bot.send_message(admin_id, text)
