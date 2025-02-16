@@ -53,6 +53,7 @@ task_list_dialog = Dialog(
             width=1,
             height=5,
             id="task_list",
+            hide_on_single_page=True,
         ),
         Cancel(Const("☰ Меню"), id="cancel"),
         state=EditTasksSG.start,

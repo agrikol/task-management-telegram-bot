@@ -18,7 +18,6 @@ from aiogram_dialog.api.entities import ShowMode
 async def add_name_handler(
     message: Message, widget: TextInput, manager: DialogManager, text: str
 ) -> None:
-    bot: Bot = manager.middleware_data["bot"]
     manager.dialog_data.update(name=text)
     await message.delete()
     await manager.switch_to(CreateTaskSG.start, show_mode=ShowMode.EDIT)
@@ -28,7 +27,6 @@ async def add_desc_handler(
     message: Message, widget: TextInput, manager: DialogManager, text: str
 ) -> None:
     manager.dialog_data.update(desc=text)
-    bot: Bot = manager.middleware_data["bot"]
     await message.delete()
     await manager.switch_to(CreateTaskSG.start, show_mode=ShowMode.EDIT)
 
